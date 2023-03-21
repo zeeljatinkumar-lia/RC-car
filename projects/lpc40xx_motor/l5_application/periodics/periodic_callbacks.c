@@ -1,7 +1,10 @@
 #include "periodic_callbacks.h"
 
 #include "board_io.h"
+#include "can_bus.h"
+#include "can_bus_module.h"
 #include "gpio.h"
+#include "motor_controller.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -10,20 +13,19 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  can_bus_module__init(can1);
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led0());
-  // Add your code here
+  // gpio__toggle(board_io__get_led0());
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led1());
-  // Add your code here
+  // gpio__toggle(board_io__get_led1());
+  motor_controller__read_all_can_messages();
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led2());
-  // Add your code here
+  // gpio__toggle(board_io__get_led2());
 }
 
 /**
