@@ -13,7 +13,7 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
-  can_bus_module__init(can1, 100, 10, 10);
+  can_bus_module__init(can1);
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {

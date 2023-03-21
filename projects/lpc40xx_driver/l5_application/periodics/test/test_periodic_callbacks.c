@@ -20,7 +20,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test__periodic_callbacks__initialize(void) {
-  can_bus_module__init_ExpectAndReturn(can1, 100, 10, 10, true);
+  can_bus_module__init_ExpectAndReturn(can1, true);
   periodic_callbacks__initialize();
 }
 

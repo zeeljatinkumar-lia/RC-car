@@ -27,12 +27,41 @@ static void helper_function_to_encode_a_sensor_value(can__msg_t *msg, dbc_ULTRAS
 }
 
 void test_driver_controller__decode_sensor_message() {
-  can__msg_t can;
+  can__msg_t msg;
   dbc_ULTRASONIC_TO_DRIVER_s val = {
       .ULTRASONIC_TO_DRIVER_front = 10, .ULTRASONIC_TO_DRIVER_left = 20, .ULTRASONIC_TO_DRIVER_right = 30};
-  helper_function_to_encode_a_sensor_value(&can, val);
-  driver_controller__decode_sensor_message(&can);
+  helper_function_to_encode_a_sensor_value(&msg, val);
+  driver_controller__decode_sensor_message(&msg);
   TEST_ASSERT_EQUAL(val.ULTRASONIC_TO_DRIVER_front, sensor_val.ULTRASONIC_TO_DRIVER_front);
   TEST_ASSERT_EQUAL(val.ULTRASONIC_TO_DRIVER_left, sensor_val.ULTRASONIC_TO_DRIVER_left);
   TEST_ASSERT_EQUAL(val.ULTRASONIC_TO_DRIVER_right, sensor_val.ULTRASONIC_TO_DRIVER_right);
+}
+
+void test_driver_controller__read_zero_messages() {
+  can__rx_ExpectAndReturn(can1, NULL, 0, false);
+  can__rx_IgnoreArg_can_message_ptr();
+  driver_controller__read_all_can_messages();
+}
+
+void test_driver_controller__read_one_messages() {
+  gpio_s gpio;
+  can__rx_ExpectAndReturn(can1, NULL, 0, true);
+  can__rx_IgnoreArg_can_message_ptr();
+  can__rx_ExpectAndReturn(can1, NULL, 0, false);
+  can__rx_IgnoreArg_can_message_ptr();
+  steer_processor_Expect(&motor_val, sensor_val);
+  board_io__get_led3_ExpectAndReturn(gpio);
+  gpio__set_Expect(gpio);
+  driver_controller__read_all_can_messages();
+}
+
+void test_driver_controller__can_send_fail() {
+  can__tx_ExpectAndReturn(can1, NULL, 0, false);
+  can__tx_IgnoreArg_can_message_ptr();
+  TEST_ASSERT_FALSE(driver_controller__send_cmd_to_motor_over_can());
+}
+void test_driver_controller__can_send_successful() {
+  can__tx_ExpectAndReturn(can1, NULL, 0, true);
+  can__tx_IgnoreArg_can_message_ptr();
+  TEST_ASSERT_TRUE(driver_controller__send_cmd_to_motor_over_can());
 }
