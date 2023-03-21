@@ -35,7 +35,7 @@ BU_: DBG DRIVER GEO MOTOR SENSOR
 BO_ 100 DRIVER_TO_MOTOR: 4 DRIVER
  SG_ DRIVER_TO_MOTOR_steer : 0|8@1- (0.01,0) [-2|2] "direction" MOTOR
  SG_ DRIVER_TO_MOTOR_speed : 8|10@1+ (0.1,0) [0|9] "kph" MOTOR
- SG_ DRIVER_TO_MOTOR_reverse : 18|4@1+ (0,0) [0|0] "" MOTOR
+ SG_ DRIVER_TO_MOTOR_reverse : 18|4@1+ (1,0) [0|0] "" MOTOR
 
 BO_ 200 ULTRASONIC_TO_DRIVER: 4 SENSOR
  SG_ ULTRASONIC_TO_DRIVER_left : 0|10@1+ (1,0) [0|511] "cm" DRIVER
@@ -56,4 +56,3 @@ BA_DEF_DEF_ "GenMsgCycleTime" 0;
 
 BA_ "GenMsgCycleTime" BO_ 100 1000;
 BA_ "GenMsgCycleTime" BO_ 200 50;
-BA_ "FieldType" SG_ 100 DRIVER_HEARTBEAT_cmd "DRIVER_HEARTBEAT_cmd";
