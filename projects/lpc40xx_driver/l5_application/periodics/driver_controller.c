@@ -60,7 +60,7 @@ void test_stub() {
 bool driver_controller__send_cmd_to_motor_over_can() {
   bool tx_status = false;
   can__msg_t msg = {0};
-  test_stub();
+  // test_stub();
   driver_controller__encode_motor_message(&msg);
   tx_status = can__tx(can1, &msg, 0);
   if (tx_status) {
