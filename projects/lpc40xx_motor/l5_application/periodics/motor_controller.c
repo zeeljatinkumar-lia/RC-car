@@ -8,25 +8,26 @@
 #define MIA_LED board_io__get_led3()
 
 const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {
-    .DRIVER_TO_MOTOR_reverse = 0, .DRIVER_TO_MOTOR_speed = 100, .DRIVER_TO_MOTOR_steer = 0};
+    .DRIVER_TO_MOTOR_reverse = 0, .DRIVER_TO_MOTOR_speed = 9, .DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__LEFT};
 
 const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 100;
 
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 
 static void motor_controller__run_motor() {
-  if (motor_val.DRIVER_TO_MOTOR_steer == 0) {
-    gpio__set(board_io__get_led0());
-    gpio__reset(board_io__get_led1());
-    gpio__set(board_io__get_led2());
-  } else if (motor_val.DRIVER_TO_MOTOR_steer == 90) {
-    gpio__reset(board_io__get_led0());
-    gpio__set(board_io__get_led1());
-    gpio__set(board_io__get_led2());
-  } else {
+  DRIVER_TO_MOTOR_steer_e steer = motor_val.DRIVER_TO_MOTOR_steer;
+  if (steer == DRIVER_TO_MOTOR_steer__RIGHT) {
     gpio__set(board_io__get_led0());
     gpio__set(board_io__get_led1());
     gpio__reset(board_io__get_led2());
+  } else if (steer == DRIVER_TO_MOTOR_steer__STRAIGHT) {
+    gpio__set(board_io__get_led0());
+    gpio__reset(board_io__get_led1());
+    gpio__set(board_io__get_led2());
+  } else if (steer == DRIVER_TO_MOTOR_steer__LEFT) {
+    gpio__reset(board_io__get_led0());
+    gpio__set(board_io__get_led1());
+    gpio__set(board_io__get_led2());
   }
 }
 
@@ -40,7 +41,6 @@ void motor_controller__read_all_can_messages() {
     dbc_decode_DRIVER_TO_MOTOR(&motor_val, header, msg.data.bytes);
     motor_controller__run_motor();
   }
-  motor_controller__run_motor();
   if (dbc_service_mia_DRIVER_TO_MOTOR(&motor_val, 10)) {
     gpio__reset(MIA_LED); // turn ON to indicate MIA
   }

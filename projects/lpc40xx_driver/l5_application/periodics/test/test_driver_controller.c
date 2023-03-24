@@ -61,7 +61,10 @@ void test_driver_controller__can_send_fail() {
   TEST_ASSERT_FALSE(driver_controller__send_cmd_to_motor_over_can());
 }
 void test_driver_controller__can_send_successful() {
+  gpio_s gpio;
   can__tx_ExpectAndReturn(can1, NULL, 0, true);
   can__tx_IgnoreArg_can_message_ptr();
+  gpio__toggle_Expect(gpio);
+  board_io__get_led0_ExpectAndReturn(gpio);
   TEST_ASSERT_TRUE(driver_controller__send_cmd_to_motor_over_can());
 }

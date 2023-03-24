@@ -13,6 +13,11 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  // turn OFF all LEDs at the beginning
+  gpio__set(board_io__get_led0());
+  gpio__set(board_io__get_led1());
+  gpio__set(board_io__get_led2());
+  gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
 }
 
@@ -21,7 +26,6 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  // gpio__toggle(board_io__get_led1());
   driver_controller__read_all_can_messages();
   driver_controller__send_cmd_to_motor_over_can();
 }

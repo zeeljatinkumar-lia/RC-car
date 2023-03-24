@@ -43,10 +43,29 @@ void driver_controller__read_all_can_messages() {
   driver_controller__manage_mia();
 }
 
+static int count = 0;
+void test_stub() {
+  count++;
+  if (count < 50) {
+    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__RIGHT;
+  } else if (count < 100) {
+    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__STRAIGHT;
+  } else if (count < 150) {
+    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__LEFT;
+  } else {
+    count = 0;
+  }
+}
+
 bool driver_controller__send_cmd_to_motor_over_can() {
   bool tx_status = false;
   can__msg_t msg = {0};
+  test_stub();
   driver_controller__encode_motor_message(&msg);
   tx_status = can__tx(can1, &msg, 0);
+  if (tx_status) {
+    // Toggle LED0 for each successful transmission
+    gpio__toggle(board_io__get_led0());
+  }
   return tx_status;
 }
