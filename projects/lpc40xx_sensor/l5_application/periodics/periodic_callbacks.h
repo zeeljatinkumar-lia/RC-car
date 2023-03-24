@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-
 typedef void (*periodic_callbacks_f)(uint32_t);
 
 /**
