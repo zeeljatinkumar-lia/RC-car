@@ -9,10 +9,10 @@
 #include "Mockboard_io.h"
 #include "Mockgpio.h"
 
-// newly added Mock
-#include "Mockcan_dbc_initializer.h"
-#include "Mockcan_handler.h"
-//#include "Mockultrasonic_sensor.h"
+#include "Mockcan_ultrasonic_sensor_handler.h"
+#include "Mockcan_ultrasonic_sensor_initializer.h"
+#include "Mocksensor_pin_init.h"
+#include "Mockultrasonic_sensor.h"
 
 // Include the source we wish to test
 #include "periodic_callbacks.h"
@@ -22,19 +22,23 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test__periodic_callbacks__initialize(void) {
-  can_dbc_init_ExpectAndReturn(true);
+  can_ultrasonic_init_ExpectAndReturn(true);
+  ultrasonic__init_all_sensors_Expect();
   periodic_callbacks__initialize();
 }
 
 void test__periodic_callbacks__1Hz(void) {
   // dbc_ULTRASONIC_TO_DRIVER_s test_sensor_struct;
-  get_ultrasonic_sensor_data_Expect();
-  can_dbc_reset_ExpectAndReturn(true);
+  ultrasonic__update_all_sensors_Expect();
+  // ultrasonic__calculate_distance_from_obstacle_Expect(NULL);
+  ultrasonic__get_distance_from_all_sensors_ExpectAnyArgs();
+  can_ultrasonic_reset_ExpectAndReturn(true);
   periodic_callbacks__1Hz(0);
 }
 
 void test__periodic_callbacks__10Hz(void) {
-  can_handler__transmit_messages_10hz_Expect();
+  can_handler__transmit_ultrasonic_sensor_messages_10hz_Expect();
+
   periodic_callbacks__10Hz(0);
 }
 
