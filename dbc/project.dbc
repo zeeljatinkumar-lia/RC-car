@@ -30,21 +30,35 @@ NS_ :
 
 BS_:
 
-BU_: DBG DRIVER GEO MOTOR SENSOR
+BU_: DBG DRIVER GEO MOTOR SENSOR_BRIDGE
 
-BO_ 100 DRIVER_TO_MOTOR: 4 DRIVER
- SG_ DRIVER_TO_MOTOR_steer : 0|8@1+ (1,0) [0|2] "direction" MOTOR
- SG_ DRIVER_TO_MOTOR_speed : 8|10@1+ (0.1,0) [0|9] "kph" MOTOR
- SG_ DRIVER_TO_MOTOR_reverse : 18|4@1+ (1,0) [0|0] "" MOTOR
 
-BO_ 200 ULTRASONIC_TO_DRIVER: 4 SENSOR
+
+BO_ 100 ULTRASONIC_TO_DRIVER: 4 SENSOR_BRIDGE
  SG_ ULTRASONIC_TO_DRIVER_left : 0|10@1+ (1,0) [0|511] "cm" DRIVER
  SG_ ULTRASONIC_TO_DRIVER_right : 10|10@1+ (1,0) [0|511] "cm" DRIVER
  SG_ ULTRASONIC_TO_DRIVER_front : 20|10@1+ (1,0) [0|511] "cm" DRIVER
 
-CM_ BU_ DRIVER "The driver controller driving the car";
-CM_ BU_ MOTOR "The motor controller of the car";
-CM_ BU_ SENSOR "The sensor controller of the car";
+BO_ 300 GPS_DESTINATION: 8 SENSOR_BRIDGE
+ SG_ GPS_DEST_LATITUDE_SCALED_100000 : 0|32@1- (1,0) [0|0] "Degrees" GEO
+ SG_ GPS_DEST_LONGITUDE_SCALED_100000 : 32|32@1- (1,0) [0|0] "Degrees" GEO
+
+
+
+BO_ 200 DRIVER_TO_MOTOR: 4 DRIVER
+ SG_ DRIVER_TO_MOTOR_steer : 0|8@1+ (1,0) [0|2] "direction" MOTOR
+ SG_ DRIVER_TO_MOTOR_speed : 8|10@1+ (0.1,0) [0|9] "kph" MOTOR
+ SG_ DRIVER_TO_MOTOR_reverse : 18|4@1+ (1,0) [0|0] "" MOTOR
+
+BO_ 400 GEO_STATUS: 8 GEO
+  SG_ GEO_STATUS_COMPASS_HEADING : 0|12@1+ (1,0) [0|359] "Degrees" DRIVER
+  SG_ GEO_STATUS_COMPASS_BEARING : 12|12@1+ (1,0) [0|359] "Degrees" DRIVER
+  SG_ GEO_STATUS_DISTANCE_TO_DESTINATION : 24|16@1+ (0.1,0) [0|0] "Meters" DRIVER
+
+CM_ BU_ DRIVER "The LED and driver controller driving the car";
+CM_ BU_ MOTOR "The DC and servo motor controller of the car";
+CM_ BU_ SENSOR_BRIDGE "The Bluetooth and the sonar sensor controller of the car";
+CM_ BU_ GEO "The GPS and compass sensor controller of the car";
 
 BA_DEF_ "BusType" STRING ;
 BA_DEF_ BO_ "GenMsgCycleTime" INT 0 0;
@@ -57,4 +71,4 @@ BA_DEF_DEF_ "GenMsgCycleTime" 0;
 BA_ "GenMsgCycleTime" BO_ 100 1000;
 BA_ "GenMsgCycleTime" BO_ 200 50;
 
-VAL_ 100 DRIVER_TO_MOTOR_steer 2 "LEFT" 1 "RIGHT" 0 "STRAIGHT" ;
+VAL_ 200 DRIVER_TO_MOTOR_steer 2 "LEFT" 1 "RIGHT" 0 "STRAIGHT" ;
