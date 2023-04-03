@@ -1,7 +1,11 @@
 #include "periodic_callbacks.h"
 
 #include "board_io.h"
+#include "can_bus.h"
+#include "can_bus_module.h"
+#include "geo_controller.h"
 #include "gpio.h"
+#include "gps.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -10,20 +14,28 @@
  */
 void periodic_callbacks__initialize(void) {
   // This method is invoked once when the periodic tasks are created
+  // turn OFF all LEDs at the beginning
+  gpio__set(board_io__get_led0());
+  gpio__set(board_io__get_led1());
+  gpio__set(board_io__get_led2());
+  gpio__set(board_io__get_led3());
+  can_bus_module__init(can1);
+  gps__init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led0());
-  // Add your code here
+  // gpio__toggle(board_io__get_led0());
 }
 
-void periodic_callbacks__10Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led1());
-  // Add your code here
-}
+void periodic_callbacks__10Hz(uint32_t callback_count) {}
+
 void periodic_callbacks__100Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led2());
-  // Add your code here
+  // gpio__toggle(board_io__get_led2());
+  // gps__get_gps_data_and_parse_coordinates();
+  // geo_controller__read_all_can_messages();
+  geo_controller__read_current_coordinates();
+  geo_controller__calculate_heading();
+  // geo_controller__send_heading_to_driver_over_can();
 }
 
 /**
@@ -32,6 +44,6 @@ void periodic_callbacks__100Hz(uint32_t callback_count) {
  * This may be disabled based on intialization of periodic_scheduler__initialize()
  */
 void periodic_callbacks__1000Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led3());
+  // gpio__toggle(board_io__get_led3());
   // Add your code here
 }
