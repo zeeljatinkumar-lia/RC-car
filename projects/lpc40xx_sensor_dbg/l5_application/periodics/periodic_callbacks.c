@@ -2,38 +2,29 @@
 
 #include "board_io.h"
 #include "gpio.h"
-// newly added header
-#include "can_ultrasonic_sensor_handler.h"
-#include "can_ultrasonic_sensor_initializer.h"
-#include "sensor_pin_init.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
  * For 1000Hz, the function must return within 1ms
  */
-
 void periodic_callbacks__initialize(void) {
-  can_ultrasonic_init();
-  ultrasonic__init_all_sensors();
   // This method is invoked once when the periodic tasks are created
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  // get sensor data every 1s
-  ultrasonic__update_all_sensors();
-  ultrasonic__get_distance_from_all_sensors(&sensor_data);
-  can_ultrasonic_reset();
+  gpio__toggle(board_io__get_led0());
   // Add your code here
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  // Transmit sensor data
-  can_handler__transmit_ultrasonic_sensor_messages_10hz();
-
+  gpio__toggle(board_io__get_led1());
   // Add your code here
 }
-void periodic_callbacks__100Hz(uint32_t callback_count) {}
+void periodic_callbacks__100Hz(uint32_t callback_count) {
+  gpio__toggle(board_io__get_led2());
+  // Add your code here
+}
 
 /**
  * @warning
@@ -41,6 +32,6 @@ void periodic_callbacks__100Hz(uint32_t callback_count) {}
  * This may be disabled based on intialization of periodic_scheduler__initialize()
  */
 void periodic_callbacks__1000Hz(uint32_t callback_count) {
-
+  gpio__toggle(board_io__get_led3());
   // Add your code here
 }
