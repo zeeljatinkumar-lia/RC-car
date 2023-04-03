@@ -3,32 +3,21 @@
 #include "can_bus.h"
 #include "can_bus_module.h"
 #include "gpio.h"
+#include "motor.h"
 #include "project.h"
 
 #define MIA_LED board_io__get_led3()
 
 const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {
-    .DRIVER_TO_MOTOR_reverse = 0, .DRIVER_TO_MOTOR_speed = 9, .DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__LEFT};
+    .DRIVER_TO_MOTOR_reverse = 0, .DRIVER_TO_MOTOR_speed = 9, .DRIVER_TO_MOTOR_steer = 0};
 
 const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 100;
 
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 
 static void motor_controller__run_motor() {
-  DRIVER_TO_MOTOR_steer_e steer = motor_val.DRIVER_TO_MOTOR_steer;
-  if (steer == DRIVER_TO_MOTOR_steer__RIGHT) {
-    gpio__set(board_io__get_led0());
-    gpio__set(board_io__get_led1());
-    gpio__reset(board_io__get_led2());
-  } else if (steer == DRIVER_TO_MOTOR_steer__STRAIGHT) {
-    gpio__set(board_io__get_led0());
-    gpio__reset(board_io__get_led1());
-    gpio__set(board_io__get_led2());
-  } else if (steer == DRIVER_TO_MOTOR_steer__LEFT) {
-    gpio__reset(board_io__get_led0());
-    gpio__set(board_io__get_led1());
-    gpio__set(board_io__get_led2());
-  }
+  motor__run_dc_motor_by_speed(motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_reverse);
+  motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
 void motor_controller__read_all_can_messages() {
