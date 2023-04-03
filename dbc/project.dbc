@@ -45,10 +45,10 @@ BO_ 300 GPS_DESTINATION: 8 SENSOR_BRIDGE
 
 
 
-BO_ 200 DRIVER_TO_MOTOR: 4 DRIVER
- SG_ DRIVER_TO_MOTOR_steer : 0|8@1+ (1,0) [0|2] "direction" MOTOR
- SG_ DRIVER_TO_MOTOR_speed : 8|10@1+ (0.1,0) [0|9] "kph" MOTOR
- SG_ DRIVER_TO_MOTOR_reverse : 18|4@1+ (1,0) [0|0] "" MOTOR
+BO_ 200 DRIVER_TO_MOTOR: 3 DRIVER
+ SG_ DRIVER_TO_MOTOR_steer : 0|8@1- (1,0) [0|0] "degrees" MOTOR
+ SG_ DRIVER_TO_MOTOR_speed : 8|8@1+ (1,0) [0|9] "mph" MOTOR
+ SG_ DRIVER_TO_MOTOR_reverse : 16|1@1+ (1,0) [0|0] "" MOTOR
 
 BO_ 400 GEO_STATUS: 8 GEO
   SG_ GEO_STATUS_COMPASS_HEADING : 0|12@1+ (1,0) [0|359] "Degrees" DRIVER
@@ -70,5 +70,3 @@ BA_DEF_DEF_ "GenMsgCycleTime" 0;
 
 BA_ "GenMsgCycleTime" BO_ 100 1000;
 BA_ "GenMsgCycleTime" BO_ 200 50;
-
-VAL_ 200 DRIVER_TO_MOTOR_steer 2 "LEFT" 1 "RIGHT" 0 "STRAIGHT" ;
