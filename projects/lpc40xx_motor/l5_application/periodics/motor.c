@@ -69,6 +69,7 @@ static float motor__convert_speed_to_pwm(float speed, bool reverse) {
 void motor__turn_servo_by_angle(int degrees) {
   float pwm = motor__convert_angle_to_pwm(degrees);
   pwm1__set_duty_cycle(SERVO_MOTOR, pwm);
+  delay__ms(10);
 }
 
 static void motor__brake() {
@@ -84,6 +85,7 @@ void motor__run_dc_motor_by_speed(float speed, bool reverse) {
     float reversing_pwm = motor__convert_speed_to_pwm(previous_speed, reverse);
     pwm1__set_duty_cycle(DC_MOTOR, reversing_pwm);
     delay__ms(10);
+    motor__brake();
   }
   pwm = motor__convert_speed_to_pwm(speed, reverse);
   pwm1__set_duty_cycle(DC_MOTOR, pwm);

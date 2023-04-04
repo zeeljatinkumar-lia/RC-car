@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include "motor.h"
 #include "project.h"
+#include <stdio.h>
 
 #define MIA_LED board_io__get_led3()
 
@@ -20,9 +21,34 @@ static void motor_controller__run_motor() {
   motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
+/*
+static int sign = 1;
+void fake_motor_values() {
+  if (motor_val.DRIVER_TO_MOTOR_speed >= 15) {
+    motor_val.DRIVER_TO_MOTOR_speed = 0;
+    sign = -1 * sign;
+    if (sign > 0) {
+      motor_val.DRIVER_TO_MOTOR_reverse = 0;
+    } else {
+      motor_val.DRIVER_TO_MOTOR_reverse = 1;
+    }
+  } else {
+    motor_val.DRIVER_TO_MOTOR_speed += 2.5f;
+  }
+  if (motor_val.DRIVER_TO_MOTOR_steer <= -60 || motor_val.DRIVER_TO_MOTOR_steer >= 60) {
+    motor_val.DRIVER_TO_MOTOR_steer = 0;
+  } else {
+    motor_val.DRIVER_TO_MOTOR_steer += (sign * 10);
+  }
+  printf("speed = %d, steer = %d, revere = %d\n", motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_steer,
+         motor_val.DRIVER_TO_MOTOR_reverse);
+}*/
+
 void motor_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   dbc_message_header_t header = {0};
+  // fake_motor_values();
+  // motor_controller__run_motor();
   while (can__rx(can1, &msg, 0)) {
     gpio__set(MIA_LED); // turn OFF since we received the CAN message
     header.message_dlc = msg.frame_fields.data_len;

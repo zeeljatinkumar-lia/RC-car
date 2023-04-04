@@ -10,6 +10,7 @@
 #include "Mockcan_bus.h"
 #include "Mockcan_bus_module.h"
 #include "Mockgpio.h"
+#include "Mockmotor.h"
 #include "Mockmotor_controller.h"
 
 // Include the source we wish to test
@@ -31,6 +32,7 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led3_ExpectAndReturn(gpio);
 
   can_bus_module__init_ExpectAndReturn(can1, true);
+  motor__init_Expect();
   periodic_callbacks__initialize();
 }
 

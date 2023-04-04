@@ -4,6 +4,7 @@
 #include "can_bus.h"
 #include "can_bus_module.h"
 #include "gpio.h"
+#include "motor.h"
 #include "motor_controller.h"
 
 /******************************************************************************
@@ -19,10 +20,12 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
+  motor__init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led0());
+  // motor_controller__read_all_can_messages();
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
