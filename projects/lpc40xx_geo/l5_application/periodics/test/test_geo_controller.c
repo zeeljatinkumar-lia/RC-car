@@ -1,5 +1,6 @@
 #include "Mockboard_io.h"
 #include "Mockcan_bus.h"
+#include "Mockcompass.h"
 #include "Mockgpio.h"
 #include "Mockgps.h"
 
