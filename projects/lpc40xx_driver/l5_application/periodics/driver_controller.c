@@ -12,6 +12,7 @@ const dbc_ULTRASONIC_TO_DRIVER_s dbc_mia_replacement_ULTRASONIC_TO_DRIVER = {
 const uint32_t dbc_mia_threshold_ULTRASONIC_TO_DRIVER = 100;
 
 static dbc_ULTRASONIC_TO_DRIVER_s sensor_val;
+static dbc_GEO_STATUS_s geo_heading;
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 
 static void driver_controller__manage_mia() {
@@ -26,6 +27,11 @@ static void driver_controller__decode_sensor_message(can__msg_t *msg) {
   dbc_decode_ULTRASONIC_TO_DRIVER(&sensor_val, header, msg->data.bytes);
 }
 
+static void driver_controller__decode_geo_message(can__msg_t *msg) {
+  const dbc_message_header_t header = {.message_dlc = msg->frame_fields.data_len, .message_id = msg->msg_id};
+  dbc_decode_GEO_STATUS(&geo_heading, header, msg->data.bytes);
+}
+
 static void driver_controller__encode_motor_message(can__msg_t *msg) {
   dbc_message_header_t header = {0};
   header = dbc_encode_DRIVER_TO_MOTOR(msg->data.bytes, &motor_val);
@@ -37,30 +43,16 @@ void driver_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   while (can__rx(can1, &msg, 0)) {
     driver_controller__decode_sensor_message(&msg);
-    steer_processor(&motor_val, sensor_val);
+    driver_controller__decode_geo_message(&msg);
+    steer_processor(&motor_val, sensor_val, geo_heading);
     gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   driver_controller__manage_mia();
 }
 
-static int count = 0;
-void test_stub() {
-  count++;
-  if (count < 50) {
-    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__RIGHT;
-  } else if (count < 100) {
-    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__STRAIGHT;
-  } else if (count < 150) {
-    motor_val.DRIVER_TO_MOTOR_steer = DRIVER_TO_MOTOR_steer__LEFT;
-  } else {
-    count = 0;
-  }
-}
-
 bool driver_controller__send_cmd_to_motor_over_can() {
   bool tx_status = false;
   can__msg_t msg = {0};
-  // test_stub();
   driver_controller__encode_motor_message(&msg);
   tx_status = can__tx(can1, &msg, 0);
   if (tx_status) {
