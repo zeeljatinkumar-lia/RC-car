@@ -2,10 +2,10 @@
 #include "board_io.h"
 #include "can_bus.h"
 
+#include "can_ultrasonic_sensor_handler.h"
 #include "gpio.h"
 #include "stdio.h"
 #include "ultrasonic_sensor.h"
-#include "can_ultrasonic_sensor_handler.h"
 
 static can__msg_t can_msg;
 

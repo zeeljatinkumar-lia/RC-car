@@ -1,4 +1,5 @@
 #include "sensor_pin_init.h"
+#include "stdio.h"
 
 #include "gpio.h"
 
@@ -39,10 +40,10 @@ void ultrasonic__update_all_sensors(void) { ultrasonic__calculate_distance_from_
 
 void ultrasonic__get_distance_from_all_sensors(ultrasonic_distance_s *output) {
   output->left = sensor_left.distance_from_obstacle;
+  printf("sensor value: %lf\n", output->left);
 }
 
 static void ultrasonic__init_ports_and_pins(void) { ultrasonic__init_ports_and_pins_left(); }
-
 static void ultrasonic__init_ports_and_pins_left() {
   sensor_left.echo_input.port_number = ULTRASONIC_LEFT_SENSOR_INPUT_PORT;
   sensor_left.echo_input.pin_number = ULTRASONIC_LEFT_ECHO_INPUT_PIN;
