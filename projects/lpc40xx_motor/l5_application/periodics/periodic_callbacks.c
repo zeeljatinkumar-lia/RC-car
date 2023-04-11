@@ -25,7 +25,7 @@ void periodic_callbacks__initialize(void) {
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led0());
-  // motor_controller__read_all_can_messages();
+  motor_controller__print_motor_cmd_values();
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {

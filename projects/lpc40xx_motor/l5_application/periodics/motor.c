@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#include "delay.h"
 #include "gpio.h"
 #include "pwm1.h"
 #include <stdint.h>
@@ -30,7 +29,6 @@ void motor__init(void) {
   pwm1__init_single_edge(100);
   pwm1__set_duty_cycle(DC_MOTOR, PWM_CENTRAL_VALUE);
   pwm1__set_duty_cycle(SERVO_MOTOR, PWM_CENTRAL_VALUE);
-  delay__ms(200);
 }
 
 /* pwm value 15.0f = straight (0 degrees)
@@ -69,13 +67,9 @@ static float motor__convert_speed_to_pwm(float speed, bool reverse) {
 void motor__turn_servo_by_angle(int degrees) {
   float pwm = motor__convert_angle_to_pwm(degrees);
   pwm1__set_duty_cycle(SERVO_MOTOR, pwm);
-  delay__ms(10);
 }
 
-static void motor__brake() {
-  pwm1__set_duty_cycle(DC_MOTOR, PWM_CENTRAL_VALUE);
-  delay__ms(10);
-}
+static void motor__brake() { pwm1__set_duty_cycle(DC_MOTOR, PWM_CENTRAL_VALUE); }
 
 void motor__run_dc_motor_by_speed(float speed, bool reverse) {
   float pwm = 0.0f;
@@ -84,7 +78,6 @@ void motor__run_dc_motor_by_speed(float speed, bool reverse) {
     motor__brake();
     float reversing_pwm = motor__convert_speed_to_pwm(previous_speed, reverse);
     pwm1__set_duty_cycle(DC_MOTOR, reversing_pwm);
-    delay__ms(10);
     motor__brake();
   }
   pwm = motor__convert_speed_to_pwm(speed, reverse);

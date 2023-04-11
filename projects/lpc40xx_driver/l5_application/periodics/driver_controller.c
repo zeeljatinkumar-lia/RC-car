@@ -5,6 +5,8 @@
 #include "project.h"
 #include "steer_processor.h"
 
+#include "stdio.h"
+
 #define MIA_LED board_io__get_led3()
 
 const dbc_ULTRASONIC_TO_DRIVER_s dbc_mia_replacement_ULTRASONIC_TO_DRIVER = {
@@ -37,6 +39,12 @@ static void driver_controller__encode_motor_message(can__msg_t *msg) {
   header = dbc_encode_DRIVER_TO_MOTOR(msg->data.bytes, &motor_val);
   msg->frame_fields.data_len = header.message_dlc;
   msg->msg_id = header.message_id;
+}
+
+void print_heading_and_motor_cmds() {
+  printf("heading=%d, dist=%f, steer=%d, speed=%d\n", geo_heading.GEO_STATUS_COMPASS_HEADING,
+         geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION, motor_val.DRIVER_TO_MOTOR_steer,
+         motor_val.DRIVER_TO_MOTOR_speed);
 }
 
 void driver_controller__read_all_can_messages() {

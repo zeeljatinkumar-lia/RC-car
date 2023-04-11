@@ -6,6 +6,7 @@
 #include "gps.h"
 #include "haversine.h"
 #include "project.h"
+#include <stdio.h>
 
 #define MIA_LED board_io__get_led3()
 
@@ -27,6 +28,16 @@ static void geo_controller__manage_mia() {
 static void geo_controller__decode_bridge_message(can__msg_t *msg) {
   const dbc_message_header_t header = {.message_dlc = msg->frame_fields.data_len, .message_id = msg->msg_id};
   dbc_decode_GPS_DESTINATION(&dest_coord, header, msg->data.bytes);
+}
+
+void geo_controller__print_coord_and_heading_values() {
+  gps_coordinates_t scaled_dest_coord = {0};
+  scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
+  scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
+  printf("cur lat %f, cur long %f, dest lat %f, dest long %f\n", current_coord.latitude, current_coord.longitude,
+         scaled_dest_coord.latitude, scaled_dest_coord.longitude);
+  printf("dist: %f, heading: %d, bearing: %d\n\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
+         geo_status.GEO_STATUS_COMPASS_HEADING, geo_status.GEO_STATUS_COMPASS_BEARING);
 }
 
 void geo_controller__read_all_can_messages() {
@@ -52,10 +63,6 @@ void geo_controller__calculate_heading() {
       current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
   geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = calculate_distance(
       current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-  printf("cur lat %f, cur long %f, dest lat %f, dest long %f\n", current_coord.latitude, current_coord.longitude,
-         scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-  printf("dist: %f, heading: %f\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
-         geo_status.GEO_STATUS_COMPASS_HEADING);
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {

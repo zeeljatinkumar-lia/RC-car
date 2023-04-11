@@ -16,13 +16,19 @@ const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 100;
 
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 
+static void motor_controller__manage_mia() {
+  const uint32_t mia_increment_value = 10;
+  if (dbc_service_mia_DRIVER_TO_MOTOR(&motor_val, mia_increment_value)) {
+    gpio__reset(MIA_LED); // turn ON to indicate MIA
+  }
+}
+
 static void motor_controller__run_motor() {
   motor__run_dc_motor_by_speed(motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_reverse);
   motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
-/*
-static int sign = 1;
+/*static int sign = 1;
 void fake_motor_values() {
   if (motor_val.DRIVER_TO_MOTOR_speed >= 15) {
     motor_val.DRIVER_TO_MOTOR_speed = 0;
@@ -44,11 +50,13 @@ void fake_motor_values() {
          motor_val.DRIVER_TO_MOTOR_reverse);
 }*/
 
+void motor_controller__print_motor_cmd_values() {
+  printf("speed=%d,steer=%d\n", motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_steer);
+}
+
 void motor_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   dbc_message_header_t header = {0};
-  // fake_motor_values();
-  // motor_controller__run_motor();
   while (can__rx(can1, &msg, 0)) {
     gpio__set(MIA_LED); // turn OFF since we received the CAN message
     header.message_dlc = msg.frame_fields.data_len;
@@ -56,7 +64,5 @@ void motor_controller__read_all_can_messages() {
     dbc_decode_DRIVER_TO_MOTOR(&motor_val, header, msg.data.bytes);
     motor_controller__run_motor();
   }
-  if (dbc_service_mia_DRIVER_TO_MOTOR(&motor_val, 10)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
-  }
+  motor_controller__manage_mia();
 }

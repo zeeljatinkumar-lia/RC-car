@@ -47,12 +47,12 @@ static void calculate_current_compass_heading(float mag[3]) {
   float Mxz = mag[2] / magnitude;
   float Mxy = mag[1] / magnitude;
   float Mxx = mag[0] / magnitude;
-  printf("Without magnitude angle: %f\n", (atan2(mag[1], mag[0])) * 180 / 3.1415926535);
+  // printf("Without magnitude angle: %f\n", (atan2(mag[1], mag[0])) * 180 / 3.1415926535);
   current_compass_heading = (atan2(Mxy, Mxx)) * 180 / PI;
   if (current_compass_heading < 0) {
     current_compass_heading = 360 + current_compass_heading;
   }
-  printf("With magitude angle: %f\n", current_compass_heading);
+  // printf("current_compass_heading: %f\n", current_compass_heading);
 }
 
 static void compass_read() {
@@ -64,7 +64,7 @@ static void compass_read() {
   mag[1] = (int16_t)(buffer[3] << 8 | buffer[2]);
   mag[2] = (int16_t)(buffer[5] << 8 | buffer[4]);
 
-  printf("x %f, y %f, z %f\n", mag[0], mag[1], mag[2]);
+  // printf("x %f, y %f, z %f\n", mag[0], mag[1], mag[2]);
   calculate_current_compass_heading(mag);
 }
 

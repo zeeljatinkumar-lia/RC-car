@@ -39,14 +39,14 @@ void test__periodic_callbacks__initialize(void) {
 }
 
 void test__periodic_callbacks__1Hz(void) {
-  geo_controller__calculate_heading_Expect();
+  geo_controller__print_coord_and_heading_values_Expect();
   periodic_callbacks__1Hz(0);
 }
 
-void test__periodic_callbacks__100Hz(void) {
+void test__periodic_callbacks__10Hz(void) {
   geo_controller__read_all_can_messages_Expect();
   geo_controller__read_current_coordinates_Expect();
-  // geo_controller__calculate_heading_Expect();
+  geo_controller__calculate_heading_Expect();
   geo_controller__send_heading_to_driver_over_can_ExpectAndReturn(true);
-  periodic_callbacks__100Hz(0);
+  periodic_callbacks__10Hz(0);
 }

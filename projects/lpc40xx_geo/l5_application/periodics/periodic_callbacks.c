@@ -26,18 +26,19 @@ void periodic_callbacks__initialize(void) {
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  geo_controller__calculate_heading();
   // gpio__toggle(board_io__get_led0());
+  geo_controller__print_coord_and_heading_values();
 }
 
-void periodic_callbacks__10Hz(uint32_t callback_count) {}
+void periodic_callbacks__10Hz(uint32_t callback_count) {
+  geo_controller__read_all_can_messages();
+  geo_controller__read_current_coordinates();
+  geo_controller__calculate_heading();
+  geo_controller__send_heading_to_driver_over_can();
+}
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
-  geo_controller__read_all_can_messages();
-  geo_controller__read_current_coordinates();
-  // geo_controller__calculate_heading();
-  geo_controller__send_heading_to_driver_over_can();
 }
 
 /**
