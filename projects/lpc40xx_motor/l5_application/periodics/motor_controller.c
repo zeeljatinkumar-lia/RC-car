@@ -9,8 +9,8 @@
 
 #define MIA_LED board_io__get_led3()
 
-const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {
-    .DRIVER_TO_MOTOR_reverse = 0, .DRIVER_TO_MOTOR_speed = 9, .DRIVER_TO_MOTOR_steer = 0};
+const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {.DRIVER_TO_MOTOR_speed = 9,
+                                                                   .DRIVER_TO_MOTOR_steer = 0};
 
 const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 100;
 
@@ -24,7 +24,7 @@ static void motor_controller__manage_mia() {
 }
 
 static void motor_controller__run_motor() {
-  motor__run_dc_motor_by_speed(motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_reverse);
+  motor__run_dc_motor_by_speed(motor_val.DRIVER_TO_MOTOR_speed);
   motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
