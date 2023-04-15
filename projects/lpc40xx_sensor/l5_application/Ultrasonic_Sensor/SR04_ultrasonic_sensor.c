@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "ultrasonic_sensor.h"
+#include "SR04_ultrasonic_sensor.h"
 
 #include "clock.h"
 #include "delay.h"
