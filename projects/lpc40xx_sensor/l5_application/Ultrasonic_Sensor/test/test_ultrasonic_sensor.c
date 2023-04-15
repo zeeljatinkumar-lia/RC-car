@@ -6,8 +6,8 @@
 #include "Mocklpc_peripherals.h"
 #include "Mocksys_time.h"
 
+#include "SR04_ultrasonic_sensor.c"
 #include "lpc40xx.h"
-#include "ultrasonic_sensor.c"
 
 void setUp() {}
 void tearDown() {}

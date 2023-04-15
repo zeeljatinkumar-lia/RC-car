@@ -28,6 +28,20 @@ void adc__initialize(void) {
       break;
     }
   }
+
+  LPC_IOCON->P1_30 &= ~(1 << 7); // Set GPIO as analog mode
+  LPC_IOCON->P1_30 |= 3;
+  LPC_IOCON->P1_30 &= ~(3 << 3);
+
+  // SJ2 ADC5 // for right
+  LPC_IOCON->P1_31 &= ~(1 << 7); // Set GPIO as analog mode
+  LPC_IOCON->P1_31 |= 3;
+  LPC_IOCON->P1_31 &= ~(3 << 3); // FUNC Bit selection
+
+  // SJ2 ADC2 // for left
+  LPC_IOCON->P0_25 &= ~(1 << 7); // Set GPIO as analog mode
+  LPC_IOCON->P0_25 |= 1;
+  LPC_IOCON->P0_25 &= ~(3 << 3); // FUNC Bit selection
 }
 
 uint16_t adc__get_adc_value(adc_channel_e channel_num) {
