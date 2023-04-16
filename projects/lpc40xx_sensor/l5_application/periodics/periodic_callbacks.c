@@ -19,12 +19,20 @@
  */
 
 void periodic_callbacks__initialize(void) {
+  gpio__set(board_io__get_led0());
+  gpio__set(board_io__get_led1());
+  gpio__set(board_io__get_led2());
+  gpio__set(board_io__get_led3());
+
   can_ultrasonic_init();
   Bridge_Controller_init();
   Sensor_Controller_init();
 }
 
-void periodic_callbacks__1Hz(uint32_t callback_count) { can_ultrasonic_reset(); }
+void periodic_callbacks__1Hz(uint32_t callback_count) {
+  Sensor_Controller__print_sensor_values();
+  can_ultrasonic_reset();
+}
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   // //TODO:zeel fetch all the sensor data and pass it on the can bus

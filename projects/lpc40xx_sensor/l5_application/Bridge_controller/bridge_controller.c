@@ -76,13 +76,13 @@ void can_bridge_controller__Sending_dest_location(void) {
   };
   dbc_GPS_DESTINATION_s BRIDGE_TO_GPS_DATA = {};
   dbc_GPS_DESTINATION_s BRIDGE_DEFAULT_DATA = {};
-  
+
   if (gps_dest_data_latched) {
     BRIDGE_TO_GPS_DATA.GPS_DEST_LATITUDE_SCALED_100000 =
         gps_destination_location_last_sent.GPS_DEST_LATITUDE_SCALED_100000;
     BRIDGE_TO_GPS_DATA.GPS_DEST_LONGITUDE_SCALED_100000 =
         gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000;
-    
+
     header = dbc_encode_GPS_DESTINATION(can_msg.data.bytes, &gps_destination_location_last_sent);
 
     can_msg.msg_id = header.message_id;
@@ -98,7 +98,6 @@ void can_bridge_controller__Sending_dest_location(void) {
     can_msg.frame_fields.data_len = header.message_dlc;
     can__tx(can1, &can_msg, 0);
   }
-  
 }
 
 void bridge_controller_handler__parse_gps_data(void) {
@@ -126,7 +125,5 @@ void bridge_controller_handler__parse_gps_data(void) {
     }
 
     line_buffer__init(&line, line_buffer, sizeof(line_buffer));
-    
   }
-
 }

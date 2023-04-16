@@ -19,6 +19,12 @@ void Sensor_Controller_init(void) {
   ultrasonic__init_front_sensor();
 }
 
+void Sensor_Controller__print_sensor_values() {
+  printf("L:%d F:%d R:%d B:%d\n", ultra_sonic_data.ULTRASONIC_TO_DRIVER_left,
+         ultra_sonic_data.ULTRASONIC_TO_DRIVER_front, ultra_sonic_data.ULTRASONIC_TO_DRIVER_right,
+         ultra_sonic_data.ULTRASONIC_TO_DRIVER_back);
+}
+
 void Sensor_Controller__10hz_handler(uint32_t callback_count) {
   // const uint32_t callback_count_modulo_val = 5;
   // const uint32_t callback_count_remainder = callback_count % callback_count_modulo_val;
@@ -31,9 +37,5 @@ void Sensor_Controller__10hz_handler(uint32_t callback_count) {
 
   ultrasonic__update_front_sensor();
   ultrasonic__get_distance_from_front_sensors(&ultra_sonic_data);
-
-  printf("left-sensor value: %d\n", ultra_sonic_data.ULTRASONIC_TO_DRIVER_left);
-  printf("right-sensor value: %d\n", ultra_sonic_data.ULTRASONIC_TO_DRIVER_right);
-  printf("front-sensor value: %d\n", ultra_sonic_data.ULTRASONIC_TO_DRIVER_front);
 }
 dbc_ULTRASONIC_TO_DRIVER_s get_ultra_sonic_data(void) { return ultra_sonic_data; }

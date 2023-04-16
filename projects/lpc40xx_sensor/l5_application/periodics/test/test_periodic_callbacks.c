@@ -28,7 +28,17 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test__periodic_callbacks__initialize(void) {
+  gpio_s gpio;
+  gpio__set_Expect(gpio);
+  board_io__get_led0_ExpectAndReturn(gpio);
   can_ultrasonic_init_ExpectAndReturn(true);
+  gpio__set_Expect(gpio);
+  board_io__get_led1_ExpectAndReturn(gpio);
+  gpio__set_Expect(gpio);
+  board_io__get_led2_ExpectAndReturn(gpio);
+  gpio__set_Expect(gpio);
+  board_io__get_led3_ExpectAndReturn(gpio);
+
   Bridge_Controller_init_Expect();
   Sensor_Controller_init_Expect();
   periodic_callbacks__initialize();
@@ -37,6 +47,7 @@ void test__periodic_callbacks__initialize(void) {
 void test__periodic_callbacks__1Hz(void) {
 
   can_ultrasonic_reset_ExpectAndReturn(true);
+  Sensor_Controller__print_sensor_values_Expect();
   periodic_callbacks__1Hz(0);
 }
 

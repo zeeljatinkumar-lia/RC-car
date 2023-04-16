@@ -11,6 +11,7 @@
 
 #include "LV_sensor_pin_init.h"
 #define BUFFER_SIZE 32
+#define SCALING_FACTOR 0.333 // divide by 3 to get cm values, as per experimentation
 
 static const uint8_t sensor_trigger_delay = 20;
 
@@ -20,11 +21,8 @@ static gpio_s left_ultra_sonic_trigger;
 static gpio_s right_ultra_sonic_trigger;
 
 // static uint16_t front_sensor_distance_inches[BUFFER_SIZE];
-static uint16_t left_sensor_distance_inches[BUFFER_SIZE];
-static uint16_t right_sensor_distance_inches[BUFFER_SIZE];
-
-static const float SCALING_FACTOR = 8;
-static float distance_in_inches;
+static uint16_t left_sensor_distance_cm[BUFFER_SIZE];
+static uint16_t right_sensor_distance_cm[BUFFER_SIZE];
 
 void initialize_adc_for_ultra_sonic_sensors(void) { adc__initialize(); }
 
@@ -48,32 +46,36 @@ void initialize_pins_for_ultra_sonic_sensor_triggers(void) {
 
 void fill_left_ultra_sonic_distance_buffer(void) {
   uint16_t left_sensor_raw_data;
+  float distance_in_cm;
   size_t i;
 
-  memset(left_sensor_distance_inches, 0, BUFFER_SIZE * sizeof(uint16_t));
+  memset(left_sensor_distance_cm, 0, BUFFER_SIZE * sizeof(uint16_t));
 
   gpio__set(left_ultra_sonic_trigger);
   delay__us(sensor_trigger_delay);
   for (i = 0; i < BUFFER_SIZE; i++) {
     left_sensor_raw_data = adc__get_adc_value(ADC__CHANNEL_2);
-    distance_in_inches = ((float)left_sensor_raw_data / SCALING_FACTOR) + 0.5;
-    left_sensor_distance_inches[i] = ((uint32_t)distance_in_inches);
+    distance_in_cm = left_sensor_raw_data * SCALING_FACTOR;
+    left_sensor_distance_cm[i] = ((uint32_t)distance_in_cm);
   }
   gpio__reset(left_ultra_sonic_trigger);
 }
 
 void fill_right_ultra_sonic_distance_buffer(void) {
   uint16_t right_sensor_raw_data;
+  float distance_in_cm;
   size_t i;
-  memset(right_sensor_distance_inches, 0, BUFFER_SIZE * sizeof(uint16_t));
+  memset(right_sensor_distance_cm, 0, BUFFER_SIZE * sizeof(uint16_t));
 
   gpio__set(right_ultra_sonic_trigger);
   delay__us(sensor_trigger_delay);
   for (i = 0; i < BUFFER_SIZE; i++) {
     right_sensor_raw_data = adc__get_adc_value(ADC__CHANNEL_5);
-    distance_in_inches = ((float)right_sensor_raw_data / SCALING_FACTOR) + 0.5;
-    right_sensor_distance_inches[i] = ((uint32_t)distance_in_inches);
+    // printf("%d ", right_sensor_raw_data);
+    distance_in_cm = right_sensor_raw_data * SCALING_FACTOR;
+    right_sensor_distance_cm[i] = ((uint32_t)distance_in_cm);
   }
+  // printf("\n");
   gpio__reset(right_ultra_sonic_trigger);
 }
 
@@ -85,18 +87,14 @@ uint16_t sort_sensor_buffer_data_and_get_median(ultra_sonic_sensor_position sens
 
   switch (sensor_position) {
   case LEFT_ULTRA_SONIC:
-    qsort(left_sensor_distance_inches, BUFFER_SIZE, sizeof(uint16_t), compare);
-    distance_val_to_return = left_sensor_distance_inches[median_position];
+    qsort(left_sensor_distance_cm, BUFFER_SIZE, sizeof(uint16_t), compare);
+    distance_val_to_return = left_sensor_distance_cm[median_position];
     break;
 
   case RIGHT_ULTRA_SONIC:
-    qsort(right_sensor_distance_inches, BUFFER_SIZE, sizeof(uint16_t), compare);
-    distance_val_to_return = right_sensor_distance_inches[median_position];
+    qsort(right_sensor_distance_cm, BUFFER_SIZE, sizeof(uint16_t), compare);
+    distance_val_to_return = right_sensor_distance_cm[median_position];
     break;
-  }
-
-  if (distance_val_to_return > 99) {
-    distance_val_to_return = 99;
   }
   return distance_val_to_return;
 }
