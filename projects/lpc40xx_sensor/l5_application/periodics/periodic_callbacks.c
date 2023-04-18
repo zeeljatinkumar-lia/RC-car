@@ -2,10 +2,14 @@
 
 #include "board_io.h"
 #include "gpio.h"
-// newly added header
+
+#include "SR04_sensor_pin_init.h"
+
+#include "LV_sensor_controller.h"
+#include "LV_sensor_pin_init.h"
+#include "bridge_controller.h"
 #include "can_ultrasonic_sensor_handler.h"
 #include "can_ultrasonic_sensor_initializer.h"
-#include "sensor_pin_init.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -14,25 +18,32 @@
  */
 
 void periodic_callbacks__initialize(void) {
+  gpio__set(board_io__get_led0());
+  gpio__set(board_io__get_led1());
+  gpio__set(board_io__get_led2());
+  gpio__set(board_io__get_led3());
+
   can_ultrasonic_init();
-  ultrasonic__init_all_sensors();
-  // This method is invoked once when the periodic tasks are created
+  Bridge_Controller_init();
+  Sensor_Controller_init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
-  // get sensor data every 1s
-  ultrasonic__update_all_sensors();
-  ultrasonic__get_distance_from_all_sensors(&sensor_data);
+  Sensor_Controller__print_sensor_values();
   can_ultrasonic_reset();
-  // Add your code here
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  // Transmit sensor data
-  can_handler__transmit_ultrasonic_sensor_messages_10hz();
 
-  // Add your code here
+  Bridge_Controller__10hz_handler();
+
+  Sensor_Controller__10hz_handler(callback_count);
+  can_ultrasonic_sensor_transmit_messages_10hz();
+  can_bridge_controller__Sending_dest_location();
+
+  bridge_controller_transmit_sensor_value_to_app();
 }
+
 void periodic_callbacks__100Hz(uint32_t callback_count) {}
 
 /**
