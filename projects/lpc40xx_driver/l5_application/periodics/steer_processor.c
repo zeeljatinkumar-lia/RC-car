@@ -49,7 +49,9 @@ static bool check_for_obstacle(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_ULTRASONIC_
     path_clear_status = true;
   } else {
     // move away from the obstacle first before going towards the destination
-    if (front_path_is_clear(front_sensor_cm) == false) {
+    if (front_path_is_clear(front_sensor_cm)) {
+      drive_straight(motor_val);
+    } else {
       // if there is an obstacle in front, try going to the right first
       if (right_path_is_clear(right_sensor_cm)) {
         steer_right(motor_val);
@@ -67,7 +69,8 @@ static bool check_for_obstacle(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_ULTRASONIC_
 static void drive_towards_destination(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_GEO_STATUS_s geo_heading) {
   int heading_diff = geo_heading.GEO_STATUS_COMPASS_BEARING - geo_heading.GEO_STATUS_COMPASS_HEADING;
   if (geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION > 0) {
-    if (heading_diff == 0) {
+    drive_straight(motor_val); // TODO: this is only for testing obstacle avoidance
+    /*if (heading_diff == 0) {
       drive_straight(motor_val);
     } else if (heading_diff > 0 && heading_diff <= 180) {
       // actual logic TBD
@@ -75,7 +78,7 @@ static void drive_towards_destination(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_GEO_
     } else {
       // actual logic TBD
       steer_left(motor_val);
-    }
+    }*/
   } else {
     stop_driving(motor_val); // we reached the destination
   }

@@ -30,23 +30,19 @@ static void motor_controller__run_motor() {
   motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
-/*static int sign = 1;
+/*static int speed_sign = 1, steer_sign = 1;
 void fake_motor_values() {
-  if (motor_val.DRIVER_TO_MOTOR_speed >= 10) {
-    motor_val.DRIVER_TO_MOTOR_speed = -10;
-    sign = -1 * sign;
-    if (sign > 0) {
-      // motor_val.DRIVER_TO_MOTOR_reverse = 0;
-    } else {
-      // motor_val.DRIVER_TO_MOTOR_reverse = 1;
-    }
+  if (motor_val.DRIVER_TO_MOTOR_speed <= -30 || motor_val.DRIVER_TO_MOTOR_speed >= 30) {
+    motor_val.DRIVER_TO_MOTOR_speed = 0;
+    speed_sign = -1 * speed_sign;
   } else {
-    motor_val.DRIVER_TO_MOTOR_speed += 2.5f;
+    motor_val.DRIVER_TO_MOTOR_speed += (speed_sign * 5);
   }
   if (motor_val.DRIVER_TO_MOTOR_steer <= -60 || motor_val.DRIVER_TO_MOTOR_steer >= 60) {
     motor_val.DRIVER_TO_MOTOR_steer = 0;
+    steer_sign = -1 * steer_sign;
   } else {
-    motor_val.DRIVER_TO_MOTOR_steer += (sign * 10);
+    motor_val.DRIVER_TO_MOTOR_steer += (steer_sign * 10);
   }
   printf("speed = %d, steer = %d,\n", motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_steer);
 }*/
@@ -73,6 +69,11 @@ void motor_controller__read_all_can_messages() {
 
 static void motor_controller__encode_speed_message(can__msg_t *msg) {
   dbc_message_header_t header = {0};
+
+  // TODO: remove this once we start getting actual speed from RPM sensor
+  speed_val.MOTOR_TO_APP_DBG_current_speed = motor_val.DRIVER_TO_MOTOR_speed;
+  speed_val.MOTOR_TO_APP_DBG_current_steer = motor_val.DRIVER_TO_MOTOR_steer;
+
   header = dbc_encode_MOTOR_TO_APP_DBG(msg->data.bytes, &speed_val);
   msg->frame_fields.data_len = header.message_dlc;
   msg->msg_id = header.message_id;

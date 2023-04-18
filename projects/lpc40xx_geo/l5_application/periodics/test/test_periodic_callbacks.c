@@ -48,5 +48,6 @@ void test__periodic_callbacks__10Hz(void) {
   geo_controller__read_current_coordinates_Expect();
   geo_controller__calculate_heading_Expect();
   geo_controller__send_heading_to_driver_over_can_ExpectAndReturn(true);
+  geo_controller__send_current_coord_to_bridge_over_can_ExpectAndReturn(true);
   periodic_callbacks__10Hz(0);
 }

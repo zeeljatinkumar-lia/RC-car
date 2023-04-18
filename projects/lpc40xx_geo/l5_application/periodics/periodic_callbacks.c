@@ -35,6 +35,7 @@ void periodic_callbacks__10Hz(uint32_t callback_count) {
   geo_controller__read_current_coordinates();
   geo_controller__calculate_heading();
   geo_controller__send_heading_to_driver_over_can();
+  geo_controller__send_current_coord_to_bridge_over_can();
 }
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {

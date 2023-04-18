@@ -27,20 +27,3 @@ double calculate_heading(double lat1, double lon1, double lat2, double lon2) {
   double bearing = atan2(y, x);
   return fmod(convert_Radians_to_degree(bearing) + 360.0, 360.0);
 }
-/*
-
-int main() {
-    double lat1 = 37.198406;
-    double lon1 = -121.542557;
-    double lat2 = 47.198404;
-    double lon2 = -111.542557;
-
-    double distance = calculate_distance(lat1, lon1, lat2, lon2);
-    double bearing = calculate_bearing(lat1, lon1, lat2, lon2);
-
-    printf("Distance: %.2f km\n", dist);
-    printf("Heading: %.2f degrees\n", bearing);
-
-    return 0;
-}
-*/
