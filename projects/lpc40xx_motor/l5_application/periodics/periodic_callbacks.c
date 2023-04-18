@@ -6,6 +6,7 @@
 #include "gpio.h"
 #include "motor.h"
 #include "motor_controller.h"
+#include "rpm.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -20,6 +21,7 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
+  rpm_sensor__init();
   motor__init();
 }
 
@@ -31,6 +33,7 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led1());
   motor_controller__read_all_can_messages();
+  motor_controller__send_motor_speed_over_can();
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());

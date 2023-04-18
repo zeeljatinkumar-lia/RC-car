@@ -12,11 +12,16 @@ void setUp() { memset(&sensor_val, 0, sizeof(sensor_val)); }
 
 void tearDown() {}
 
-void test_driver_controller__mia_happens() {
+void ignore_mia_led() {
   gpio_s gpio;
+  gpio__set_Ignore();
+  gpio__reset_Ignore();
+  board_io__get_led3_IgnoreAndReturn(gpio);
+}
+
+void test_driver_controller__mia_happens() {
+  ignore_mia_led();
   sensor_val.mia_info.mia_counter = 90;
-  board_io__get_led3_ExpectAndReturn(gpio);
-  gpio__reset_Expect(gpio);
   driver_controller__manage_mia();
 }
 
@@ -44,14 +49,12 @@ void test_driver_controller__read_zero_messages() {
 }
 
 void test_driver_controller__read_one_messages() {
-  gpio_s gpio;
+  ignore_mia_led();
   can__rx_ExpectAndReturn(can1, NULL, 0, true);
   can__rx_IgnoreArg_can_message_ptr();
   can__rx_ExpectAndReturn(can1, NULL, 0, false);
   can__rx_IgnoreArg_can_message_ptr();
   steer_processor_Expect(&motor_val, sensor_val, geo_heading);
-  board_io__get_led3_ExpectAndReturn(gpio);
-  gpio__set_Expect(gpio);
   driver_controller__read_all_can_messages();
 }
 

@@ -12,6 +12,7 @@
 #include "Mockgpio.h"
 #include "Mockmotor.h"
 #include "Mockmotor_controller.h"
+#include "Mockrpm.h"
 
 // Include the source we wish to test
 #include "periodic_callbacks.h"
@@ -32,6 +33,7 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led3_ExpectAndReturn(gpio);
 
   can_bus_module__init_ExpectAndReturn(can1, true);
+  rpm_sensor__init_Expect();
   motor__init_Expect();
   periodic_callbacks__initialize();
 }
@@ -41,5 +43,6 @@ void test__periodic_callbacks__10Hz(void) {
   // gpio__toggle_Expect(gpio);
   // board_io__get_led1_ExpectAndReturn(gpio);
   motor_controller__read_all_can_messages_Expect();
+  motor_controller__send_motor_speed_over_can_ExpectAndReturn(true);
   periodic_callbacks__10Hz(0);
 }

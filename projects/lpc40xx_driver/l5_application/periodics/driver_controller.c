@@ -20,7 +20,7 @@ static dbc_DRIVER_TO_MOTOR_s motor_val;
 static void driver_controller__manage_mia() {
   const uint32_t mia_increment_value = 10;
   if (dbc_service_mia_ULTRASONIC_TO_DRIVER(&sensor_val, mia_increment_value)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
+    // gpio__reset(MIA_LED); // turn ON to indicate MIA
   }
 }
 
@@ -53,7 +53,7 @@ void driver_controller__read_all_can_messages() {
     driver_controller__decode_sensor_message(&msg);
     driver_controller__decode_geo_message(&msg);
     steer_processor(&motor_val, sensor_val, geo_heading);
-    gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    // gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   driver_controller__manage_mia();
 }
