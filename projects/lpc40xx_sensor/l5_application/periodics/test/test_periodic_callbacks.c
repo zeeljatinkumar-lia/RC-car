@@ -55,6 +55,8 @@ void test__periodic_callbacks__10Hz(void) {
   Bridge_Controller__10hz_handler_Expect();
   Sensor_Controller__10hz_handler_ExpectAnyArgs();
   can_ultrasonic_sensor_transmit_messages_10hz_Expect();
+  can_bridge_controller__Sending_dest_location_Expect();
+  bridge_controller_transmit_sensor_value_to_app_Expect();
   periodic_callbacks__10Hz(0);
 }
 

@@ -22,6 +22,9 @@ void test_Sensor_Controller__100hz_handler(void) {
   fill_right_ultra_sonic_distance_buffer_Expect();
   sort_sensor_buffer_data_and_get_median_ExpectAndReturn(RIGHT_ULTRA_SONIC, right_sensor_median);
 
+  fill_back_ultra_sonic_distance_buffer_Expect();
+  sort_sensor_buffer_data_and_get_median_ExpectAndReturn(BACK_ULTRA_SONIC, right_sensor_median);
+
   ultrasonic__update_front_sensor_Expect();
   ultrasonic__get_distance_from_front_sensors_ExpectAnyArgs();
   Sensor_Controller__10hz_handler(0);

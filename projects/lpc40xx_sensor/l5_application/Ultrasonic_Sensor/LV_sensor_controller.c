@@ -35,6 +35,9 @@ void Sensor_Controller__10hz_handler(uint32_t callback_count) {
   fill_right_ultra_sonic_distance_buffer();
   ultra_sonic_data.ULTRASONIC_TO_DRIVER_right = sort_sensor_buffer_data_and_get_median(RIGHT_ULTRA_SONIC);
 
+  fill_back_ultra_sonic_distance_buffer();
+  ultra_sonic_data.ULTRASONIC_TO_DRIVER_back = sort_sensor_buffer_data_and_get_median(BACK_ULTRA_SONIC);
+
   ultrasonic__update_front_sensor();
   ultrasonic__get_distance_from_front_sensors(&ultra_sonic_data);
 }

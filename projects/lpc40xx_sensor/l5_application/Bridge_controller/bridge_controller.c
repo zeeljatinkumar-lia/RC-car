@@ -12,8 +12,11 @@
 
 #include "sl_string.h"
 #include "uart.h"
+#include "uart_printf.h"
 #include <gpio.h>
 #include <stdio.h>
+
+#include "LV_sensor_controller.h"
 
 static dbc_GPS_DESTINATION_s gps_destination_location;
 static dbc_GPS_DESTINATION_s gps_destination_location_last_sent;
@@ -26,6 +29,8 @@ static uart_e bridge_uart = UART__3;
 /* STATIC FUNCTION*/
 static void Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void);
 static void Bridge_Controller__get_line_from_buffer(void);
+
+// static void bridge_transmit_messages_to_app(char *message);
 /* NON-STATIC FUNCTION*/
 
 void bridge_controller_handler__parse_gps_data(void);
@@ -113,7 +118,6 @@ void bridge_controller_handler__parse_gps_data(void) {
 
     printf("Latitude is %ld and longitude is %ld \n", gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
            gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
-    // printf("latched \n");
     gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000 =
         gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000;
     gps_destination_location_last_sent.GPS_DEST_LATITUDE_SCALED_100000 =
@@ -126,4 +130,15 @@ void bridge_controller_handler__parse_gps_data(void) {
 
     line_buffer__init(&line, line_buffer, sizeof(line_buffer));
   }
+}
+
+void bridge_controller_transmit_sensor_value_to_app(void) {
+  char sensor_msg[100] = {0};
+  dbc_ULTRASONIC_TO_DRIVER_s sensor_values = get_ultra_sonic_data();
+
+  snprintf(sensor_msg, 100, "%d,%d,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
+           sensor_values.ULTRASONIC_TO_DRIVER_front, sensor_values.ULTRASONIC_TO_DRIVER_right,
+           sensor_values.ULTRASONIC_TO_DRIVER_back);
+
+  uart_printf(bridge_uart, "%s", sensor_msg);
 }

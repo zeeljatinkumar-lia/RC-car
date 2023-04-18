@@ -8,6 +8,8 @@
 #include "Mockqueue.h"
 #include "Mockuart.h"
 
+#include "MockLV_sensor_controller.h"
+#include "Mockuart_printf.h"
 #include "bridge_controller.c"
 
 static char line_buffer[100];
@@ -40,4 +42,12 @@ void test__Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void
   line_buffer__add_byte_ExpectAndReturn(&line, byte, true);
   uart__get_ExpectAndReturn(bridge_uart, &byte, zero_timeout, false);
   Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer();
+}
+
+void test_bridge_controller_transmit_sensor_value_to_app(void) {
+  dbc_ULTRASONIC_TO_DRIVER_s mock_return_value;
+  get_ultra_sonic_data_ExpectAndReturn(mock_return_value);
+  uart_printf_ExpectAnyArgsAndReturn(true);
+
+  bridge_controller_transmit_sensor_value_to_app();
 }
