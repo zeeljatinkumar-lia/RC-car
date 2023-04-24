@@ -13,6 +13,7 @@
 // Only Channel2, Channel4 and Channel5 pins are avaible for use on SJ2 Development board
 typedef enum {
   ADC__CHANNEL_2 = 2, // Pin Available on SJ2
+  ADC__CHANNEL_3 = 3, // Pin Available on SJ2
   ADC__CHANNEL_4 = 4, // Pin Available on SJ2
   ADC__CHANNEL_5 = 5, // Pin Available on SJ2
 } adc_channel_e;

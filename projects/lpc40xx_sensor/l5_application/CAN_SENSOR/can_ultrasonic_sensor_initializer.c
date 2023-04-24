@@ -2,7 +2,7 @@
 #include "can_bus.h"
 bool can_ultrasonic_init(void) {
   bool can_init_status = false;
-  can_init_status = can__init(can1, 100, 5, 5, NULL, NULL);
+  can_init_status = can__init(can1, 100, 100, 100, NULL, NULL);
   can__bypass_filter_accept_all_msgs();
   can__reset_bus(can1);
 

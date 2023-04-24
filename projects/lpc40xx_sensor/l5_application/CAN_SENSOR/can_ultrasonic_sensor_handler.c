@@ -16,7 +16,7 @@ dbc_ULTRASONIC_TO_DRIVER_s LV_sensor_data;
 
 // We are assuming that we have a 10hz function in which we wish
 // to transmit all messages that should be sent at 10x per second
-void can_ultrasonic_sensor_transmit_messages_10hz(void) {
+void can_ultrasonic_sensor_transmit_messages(void) {
   // TODO_zeel: we need sensor_data from external file
   // SR04_sensor_data = can_get_sensor_data();
   sensor_struct = get_ultra_sonic_data();

@@ -1,6 +1,7 @@
 #include "unity.h"
 
 // Mock functions
+#include "Mockboard_io.h"
 #include "Mockcan_bus.h"
 #include "Mockclock.h"
 #include "Mockgpio.h"
@@ -44,10 +45,19 @@ void test__Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void
   Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer();
 }
 
-void test_bridge_controller_transmit_sensor_value_to_app(void) {
+void test_bridge_controller_transmit_value_to_app(void) {
   dbc_ULTRASONIC_TO_DRIVER_s mock_return_value;
   get_ultra_sonic_data_ExpectAndReturn(mock_return_value);
   uart_printf_ExpectAnyArgsAndReturn(true);
 
-  bridge_controller_transmit_sensor_value_to_app();
+  bridge_controller_transmit_value_to_app();
+}
+
+void test_bridge_can_mia_handler(void) {
+  compass_value_to_app.mia_info.mia_counter = 2000;
+  gpio_s led1 = {0};
+  board_io__get_led3_ExpectAndReturn(led1);
+  gpio__toggle_Expect(led1);
+
+  bridge_can_mia_handler();
 }

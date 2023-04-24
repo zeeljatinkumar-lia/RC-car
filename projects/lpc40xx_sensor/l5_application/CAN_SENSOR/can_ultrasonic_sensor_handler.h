@@ -2,4 +2,4 @@
 
 //#include "SR04_sensor_pin_init.h"
 #include "project.h"
-void can_ultrasonic_sensor_transmit_messages_10hz(void);
+void can_ultrasonic_sensor_transmit_messages(void);
