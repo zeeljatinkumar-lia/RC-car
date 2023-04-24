@@ -28,6 +28,7 @@ void motor__init(void) {
   pwm1__init_single_edge(100);
   pwm1__set_duty_cycle(DC_MOTOR, PWM_CENTRAL_VALUE);
   pwm1__set_duty_cycle(SERVO_MOTOR, PWM_CENTRAL_VALUE);
+  delay__ms(3000); // neutral signals for first 3 seconds is required for ESC calibration
 }
 
 /* pwm value 15.0f = straight (0 degrees)
