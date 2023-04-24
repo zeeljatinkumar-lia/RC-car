@@ -3,8 +3,8 @@
 #include "Mockcompass.h"
 #include "Mockgpio.h"
 #include "Mockgps.h"
+#include "Mockwaypoints.h"
 
-#include "haversine.h"
 #include "project.h"
 
 #include "geo_controller.c"

@@ -9,10 +9,10 @@ void setUp() {}
 void tearDown() {}
 
 void test_calculate_distance() {
-  TEST_ASSERT_EQUAL(111, calculate_distance(37, -121, 38, -121));
-  TEST_ASSERT_EQUAL(111, calculate_distance(37, -121, 36, -121));
-  TEST_ASSERT_EQUAL(88, calculate_distance(37, -121, 37, -120));
-  TEST_ASSERT_EQUAL(88, calculate_distance(37, -121, 37, -122));
+  TEST_ASSERT_EQUAL(111, calculate_distance_in_meters(37, -121, 38, -121) / 1000);
+  TEST_ASSERT_EQUAL(111, calculate_distance_in_meters(37, -121, 36, -121) / 1000);
+  TEST_ASSERT_EQUAL(88, calculate_distance_in_meters(37, -121, 37, -120) / 1000);
+  TEST_ASSERT_EQUAL(88, calculate_distance_in_meters(37, -121, 37, -122) / 1000);
 }
 
 void test_calculate_heading() {
@@ -29,11 +29,13 @@ void test_distance_and_heading() {
 
   dest.latitude = 38;
   dest.longitude = -122;
-  TEST_ASSERT_EQUAL(141.9, calculate_distance(curr.latitude, curr.longitude, dest.latitude, dest.longitude));
+  TEST_ASSERT_EQUAL(141.9,
+                    calculate_distance_in_meters(curr.latitude, curr.longitude, dest.latitude, dest.longitude) / 1000);
   TEST_ASSERT_EQUAL(321.5, calculate_heading(curr.latitude, curr.longitude, dest.latitude, dest.longitude));
 
   dest.latitude = 36;
   dest.longitude = -120;
-  TEST_ASSERT_EQUAL(142.7, calculate_distance(curr.latitude, curr.longitude, dest.latitude, dest.longitude));
+  TEST_ASSERT_EQUAL(142.7,
+                    calculate_distance_in_meters(curr.latitude, curr.longitude, dest.latitude, dest.longitude) / 1000);
   TEST_ASSERT_EQUAL(140.5, calculate_heading(curr.latitude, curr.longitude, dest.latitude, dest.longitude));
 }

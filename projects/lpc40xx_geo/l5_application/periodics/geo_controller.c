@@ -4,8 +4,8 @@
 #include "compass.h"
 #include "gpio.h"
 #include "gps.h"
-#include "haversine.h"
 #include "project.h"
+#include "waypoints.h"
 #include <stdio.h>
 
 #define MIA_LED board_io__get_led3()
@@ -55,27 +55,18 @@ void geo_controller__read_current_coordinates() {
   current_coord = gps__get_coordinates();
 }
 
-//TODO: Remove fake_counter logic once we implement the destination coords from Mobile App
-static int fake_counter = 0;
 void geo_controller__calculate_heading() {
   gps_coordinates_t scaled_dest_coord = {0};
 
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
 
-  if (fake_counter < 100) { // set geo_status values in first 10 seconds for testing
-    geo_status.GEO_STATUS_COMPASS_BEARING = get_current_compass_bearing();
-    geo_status.GEO_STATUS_COMPASS_HEADING = (uint16_t)calculate_heading(
-        current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-    geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = calculate_distance(
-        current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-  } else { // make the car stop for the next 10 seconds for testing
-    geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = 0;
-  }
-  fake_counter++;
-  if (fake_counter > 200) {
-    fake_counter = 0;
-  }
+  geo_status.GEO_STATUS_COMPASS_BEARING = get_current_compass_bearing();
+
+  geo_status.GEO_STATUS_COMPASS_HEADING =
+      (uint16_t)waypoints__calculate_heading_to_next_point(current_coord, scaled_dest_coord);
+  geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION =
+      waypoints__calculate_distance_to_dest(current_coord, scaled_dest_coord);
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {
