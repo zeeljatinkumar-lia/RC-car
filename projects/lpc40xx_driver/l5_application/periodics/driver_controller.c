@@ -52,7 +52,10 @@ void driver_controller__read_all_can_messages() {
   while (can__rx(can1, &msg, 0)) {
     driver_controller__decode_sensor_message(&msg);
     driver_controller__decode_geo_message(&msg);
+
+    // perform the actual driver logic here
     steer_processor(&motor_val, sensor_val, geo_heading);
+
     // gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   driver_controller__manage_mia();

@@ -12,3 +12,11 @@ bool can_bus_module__init(can__num_e can) {
   can__reset_bus(can);
   return isCanInitialized;
 }
+
+bool can_bus_module__check_for_bus_off(can__num_e can) {
+  bool can_reset_status = false;
+  if (can__is_bus_off(can))
+    can__reset_bus(can);
+  can_reset_status = true;
+  return can_reset_status;
+}
