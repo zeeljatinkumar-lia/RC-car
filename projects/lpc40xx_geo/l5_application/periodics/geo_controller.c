@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #define MIA_LED board_io__get_led3()
+static gpio_s GPS_LOCK_LED;
 
 const dbc_GPS_DESTINATION_s dbc_mia_replacement_GPS_DESTINATION = {.GPS_DEST_LATITUDE_SCALED_100000 = 0,
                                                                    .GPS_DEST_LONGITUDE_SCALED_100000 = 0};
@@ -67,6 +68,7 @@ void geo_controller__calculate_heading() {
       (uint16_t)waypoints__calculate_heading_to_next_point(current_coord, scaled_dest_coord);
   geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION =
       waypoints__calculate_distance_to_dest(current_coord, scaled_dest_coord);
+  geo_status.GEO_STATUS_SATELLITE_LOCKED = gps__get_satellite_lock_status();
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {
@@ -109,4 +111,22 @@ bool geo_controller__send_current_coord_to_bridge_over_can() {
     // gpio__toggle(board_io__get_led0());
   }
   return tx_status;
+}
+
+static void geo_controller__gps_lock_LED_init() { GPS_LOCK_LED = gpio__construct_as_output(GPIO__PORT_2, 0); }
+
+void geo_controller__init() {
+  gps__init();
+  compass_init();
+  geo_controller__gps_lock_LED_init();
+}
+
+void geo_controller__gps_lock_LED_update() {
+  if (geo_status.GEO_STATUS_SATELLITE_LOCKED) {
+    gpio__reset(GPS_LOCK_LED);         // turn ON to indicate GPS is locked
+    gpio__reset(board_io__get_led2()); // TODO: remove after LED is soldered
+  } else {
+    gpio__toggle(GPS_LOCK_LED);         // toggle to indicate GPS is still waiting for a fix
+    gpio__toggle(board_io__get_led2()); // TODO: remove after LED is soldered
+  }
 }
