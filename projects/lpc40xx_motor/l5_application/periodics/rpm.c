@@ -36,7 +36,7 @@ void rpm_sensor__init(void) {
 void rpm_sensor__update_speed_value(dbc_MOTOR_TO_APP_DBG_s *speed_val) {
   uint32_t timer_capture_value = LPC_TIM2->CR0;
   uint32_t timer_counter_value = LPC_TIM2->TC;
-  float offset = 58548.7f;
+  float offset = 44500.0f;
   speed_in_kph = (kph_scalar - offset) / timer_capture_value;
   if (timer_counter_value > timer_counter_upper_bound || timer_capture_value == 0) {
     speed_in_kph = 0.0f;

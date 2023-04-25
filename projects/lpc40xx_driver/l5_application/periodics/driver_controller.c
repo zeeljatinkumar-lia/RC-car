@@ -52,7 +52,10 @@ void driver_controller__read_all_can_messages() {
   while (can__rx(can1, &msg, 0)) {
     driver_controller__decode_sensor_message(&msg);
     driver_controller__decode_geo_message(&msg);
+
+    // perform the actual driver logic here
     steer_processor(&motor_val, sensor_val, geo_heading);
+
     // gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   driver_controller__manage_mia();
@@ -64,8 +67,10 @@ bool driver_controller__send_cmd_to_motor_over_can() {
   driver_controller__encode_motor_message(&msg);
   tx_status = can__tx(can1, &msg, 0);
   if (tx_status) {
-    // Toggle LED0 for each successful transmission
-    gpio__toggle(board_io__get_led0());
+    // Turn ON LED0 if successful transmission
+    gpio__reset(board_io__get_led0());
+  } else {
+    gpio__set(board_io__get_led0());
   }
   return tx_status;
 }

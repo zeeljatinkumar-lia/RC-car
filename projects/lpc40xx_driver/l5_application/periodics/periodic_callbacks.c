@@ -23,16 +23,17 @@ void periodic_callbacks__initialize(void) {
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led0());
+  can_bus_module__check_for_bus_off(can1);
   print_heading_and_motor_cmds();
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
-  driver_controller__read_all_can_messages();
-  driver_controller__send_cmd_to_motor_over_can();
 }
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
+  driver_controller__read_all_can_messages();
+  driver_controller__send_cmd_to_motor_over_can();
 }
 
 /**
