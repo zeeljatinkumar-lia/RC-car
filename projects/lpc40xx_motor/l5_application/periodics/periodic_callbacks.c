@@ -32,11 +32,11 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led1());
-  motor_controller__read_all_can_messages();
-  motor_controller__send_motor_speed_over_can();
 }
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
+  motor_controller__read_all_can_messages();
+  motor_controller__send_motor_speed_over_can();
 }
 
 /**

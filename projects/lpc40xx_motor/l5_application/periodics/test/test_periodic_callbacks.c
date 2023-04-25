@@ -38,11 +38,11 @@ void test__periodic_callbacks__initialize(void) {
   periodic_callbacks__initialize();
 }
 
-void test__periodic_callbacks__10Hz(void) {
+void test__periodic_callbacks__100Hz(void) {
   // gpio_s gpio;
   // gpio__toggle_Expect(gpio);
   // board_io__get_led1_ExpectAndReturn(gpio);
   motor_controller__read_all_can_messages_Expect();
   motor_controller__send_motor_speed_over_can_ExpectAndReturn(true);
-  periodic_callbacks__10Hz(0);
+  periodic_callbacks__100Hz(0);
 }
