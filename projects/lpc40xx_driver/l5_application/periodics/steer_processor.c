@@ -126,14 +126,14 @@ static bool is_front_completely_blocked() {
 }
 
 // Function to determine the steer angle based on the direction of the obstacles
-int get_steer_angle_based_on_obstacle_closeness(bool *reverse) {
+static int get_steer_angle_based_on_obstacle_closeness(bool *reverse) {
   int angle = STEER_STRAIGHT;
   if (is_front_completely_blocked() == true) {
     if (back_obstacle_threshold == OBSTACLE_THRESHOLD_LEVEL_1) {
       // we are surrounded from all sides by obstacles. stay put.
-      //do nothing
+      // do nothing
     } else {
-      //reverse and turn right
+      // reverse and turn right
       *reverse = true;
       angle = STEER_MEDIUM_RIGHT;
     }
@@ -145,7 +145,7 @@ int get_steer_angle_based_on_obstacle_closeness(bool *reverse) {
       break;
     case OBSTACLE_THRESHOLD_LEVEL_2:
     case OBSTACLE_THRESHOLD_LEVEL_1:
-    //nested switch case used here
+      // nested switch case used here
       switch (current_obstacle_status.left_status) {
       case OBSTACLE_THRESHOLD_LEVEL_3:
         angle += STEER_SOFT_RIGHT;
@@ -175,8 +175,13 @@ int get_steer_angle_based_on_obstacle_closeness(bool *reverse) {
 
 static void avoid_obstacles(dbc_DRIVER_TO_MOTOR_s *motor_val) {
   bool reverse = false;
+  int speed = 0;
   motor_val->DRIVER_TO_MOTOR_steer = get_steer_angle_based_on_obstacle_closeness(&reverse);
-  motor_val->DRIVER_TO_MOTOR_speed = get_speed_level_based_on_obstacle_distance(reverse);
+  speed = get_speed_level_based_on_obstacle_distance();
+  if (reverse) {
+    speed = -1 * speed;
+  }
+  motor_val->DRIVER_TO_MOTOR_speed = speed;
 }
 
 // Function to determine the speed level based on the distance to the destination
