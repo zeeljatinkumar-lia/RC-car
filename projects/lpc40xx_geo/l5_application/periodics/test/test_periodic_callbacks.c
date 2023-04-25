@@ -31,23 +31,27 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led2_ExpectAndReturn(gpio);
   gpio__set_Expect(gpio);
   board_io__get_led3_ExpectAndReturn(gpio);
-
+  geo_controller__init_Expect();
   can_bus_module__init_ExpectAndReturn(can1, true);
-  gps__init_Expect();
-  compass_init_Expect();
+
   periodic_callbacks__initialize();
 }
 
 void test__periodic_callbacks__1Hz(void) {
   geo_controller__print_coord_and_heading_values_Expect();
+  geo_controller__gps_lock_LED_update_Expect();
   periodic_callbacks__1Hz(0);
 }
 
 void test__periodic_callbacks__10Hz(void) {
-  geo_controller__read_all_can_messages_Expect();
   geo_controller__read_current_coordinates_Expect();
   geo_controller__calculate_heading_Expect();
+  periodic_callbacks__10Hz(0);
+}
+
+void test__periodic_callbacks__100Hz(void) {
+  geo_controller__read_all_can_messages_Expect();
   geo_controller__send_heading_to_driver_over_can_ExpectAndReturn(true);
   geo_controller__send_current_coord_to_bridge_over_can_ExpectAndReturn(true);
-  periodic_callbacks__10Hz(0);
+  periodic_callbacks__100Hz(0);
 }

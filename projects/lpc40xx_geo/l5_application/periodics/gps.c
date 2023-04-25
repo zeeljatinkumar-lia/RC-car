@@ -22,6 +22,7 @@ static char line_buffer[200];
 static line_buffer_s line;
 
 static gps_coordinates_t parsed_coordinates;
+static bool satellite_lock_status;
 
 static void gps__transfer_data_from_uart_driver_to_line_buffer(void) {
   char byte = 0;
@@ -45,7 +46,7 @@ We will ignore all the other fields.
 static void gps__coordinate_parser(char *str) {
   char *word;
   float latitude = 1, longitude = 1;
-  int i = 0;
+  int i = 0, lock = 0;
   word = strtok(str, ",");
   if (word && strcmp(word, "$GPGGA") == 0) {
     parsed_coordinates.latitude = latitude;
@@ -68,6 +69,14 @@ static void gps__coordinate_parser(char *str) {
       case 5:
         if (word[0] == 'W' || word[0] == 'w') {
           longitude = -1 * longitude;
+        }
+        break;
+      case 6:
+        sscanf(word, "%d", &lock);
+        if (lock == 1 || lock == 2) {
+          satellite_lock_status = true;
+        } else {
+          satellite_lock_status = false;
         }
         break;
       default:
@@ -111,3 +120,5 @@ void gps__get_gps_data_and_parse_coordinates(void) {
 }
 
 gps_coordinates_t gps__get_coordinates(void) { return parsed_coordinates; }
+
+bool gps__get_satellite_lock_status(void) { return satellite_lock_status; }
