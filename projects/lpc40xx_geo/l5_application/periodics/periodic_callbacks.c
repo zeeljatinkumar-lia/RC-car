@@ -3,6 +3,7 @@
 #include "board_io.h"
 #include "can_bus.h"
 #include "can_bus_module.h"
+#include "compass.h"
 #include "geo_controller.h"
 #include "gpio.h"
 #include "gps.h"
@@ -21,9 +22,11 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
   gps__init();
+  compass_init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
+  geo_controller__calculate_heading();
   // gpio__toggle(board_io__get_led0());
 }
 
@@ -31,11 +34,10 @@ void periodic_callbacks__10Hz(uint32_t callback_count) {}
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
-  // gps__get_gps_data_and_parse_coordinates();
-  // geo_controller__read_all_can_messages();
+  geo_controller__read_all_can_messages();
   geo_controller__read_current_coordinates();
-  geo_controller__calculate_heading();
-  // geo_controller__send_heading_to_driver_over_can();
+  // geo_controller__calculate_heading();
+  geo_controller__send_heading_to_driver_over_can();
 }
 
 /**

@@ -1,6 +1,7 @@
 #include "geo_controller.h"
 #include "board_io.h"
 #include "can_bus.h"
+#include "compass.h"
 #include "gpio.h"
 #include "gps.h"
 #include "haversine.h"
@@ -46,11 +47,15 @@ void geo_controller__calculate_heading() {
   gps_coordinates_t scaled_dest_coord = {0};
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
-  geo_status.GEO_STATUS_COMPASS_BEARING = 0;
-  geo_status.GEO_STATUS_COMPASS_HEADING = calculate_heading(current_coord.latitude, current_coord.longitude,
-                                                            scaled_dest_coord.latitude, scaled_dest_coord.longitude);
+  geo_status.GEO_STATUS_COMPASS_BEARING = get_current_compass_bearing();
+  geo_status.GEO_STATUS_COMPASS_HEADING = (uint16_t)calculate_heading(
+      current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
   geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = calculate_distance(
       current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
+  printf("cur lat %f, cur long %f, dest lat %f, dest long %f\n", current_coord.latitude, current_coord.longitude,
+         scaled_dest_coord.latitude, scaled_dest_coord.longitude);
+  printf("dist: %f, heading: %f\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
+         geo_status.GEO_STATUS_COMPASS_HEADING);
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {

@@ -9,6 +9,7 @@
 #include "Mockboard_io.h"
 #include "Mockcan_bus.h"
 #include "Mockcan_bus_module.h"
+#include "Mockcompass.h"
 #include "Mockgeo_controller.h"
 #include "Mockgpio.h"
 #include "Mockgps.h"
@@ -33,16 +34,19 @@ void test__periodic_callbacks__initialize(void) {
 
   can_bus_module__init_ExpectAndReturn(can1, true);
   gps__init_Expect();
+  compass_init_Expect();
   periodic_callbacks__initialize();
 }
 
-void test__periodic_callbacks__1Hz(void) { periodic_callbacks__1Hz(0); }
+void test__periodic_callbacks__1Hz(void) {
+  geo_controller__calculate_heading_Expect();
+  periodic_callbacks__1Hz(0);
+}
 
 void test__periodic_callbacks__100Hz(void) {
-  // geo_controller__read_all_can_messages_Expect();
+  geo_controller__read_all_can_messages_Expect();
   geo_controller__read_current_coordinates_Expect();
-  geo_controller__calculate_heading_Expect();
-  // geo_controller__send_heading_to_driver_over_can_ExpectAndReturn(true);
-  // gps__get_gps_data_and_parse_coordinates_Expect();
+  // geo_controller__calculate_heading_Expect();
+  geo_controller__send_heading_to_driver_over_can_ExpectAndReturn(true);
   periodic_callbacks__100Hz(0);
 }
