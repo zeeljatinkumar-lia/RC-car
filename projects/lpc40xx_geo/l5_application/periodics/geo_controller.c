@@ -3,6 +3,7 @@
 #include "can_bus.h"
 #include "gpio.h"
 #include "gps.h"
+#include "haversine.h"
 #include "project.h"
 
 #define MIA_LED board_io__get_led3()
@@ -22,7 +23,7 @@ static void geo_controller__manage_mia() {
   }
 }
 
-static void geo_controller__decode_sensor_message(can__msg_t *msg) {
+static void geo_controller__decode_bridge_message(can__msg_t *msg) {
   const dbc_message_header_t header = {.message_dlc = msg->frame_fields.data_len, .message_id = msg->msg_id};
   dbc_decode_GPS_DESTINATION(&dest_coord, header, msg->data.bytes);
 }
@@ -30,7 +31,7 @@ static void geo_controller__decode_sensor_message(can__msg_t *msg) {
 void geo_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   while (can__rx(can1, &msg, 0)) {
-    geo_controller__decode_sensor_message(&msg);
+    geo_controller__decode_bridge_message(&msg);
     gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   geo_controller__manage_mia();
@@ -42,9 +43,14 @@ void geo_controller__read_current_coordinates() {
 }
 
 void geo_controller__calculate_heading() {
+  gps_coordinates_t scaled_dest_coord = {0};
+  scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
+  scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
   geo_status.GEO_STATUS_COMPASS_BEARING = 0;
-  geo_status.GEO_STATUS_COMPASS_HEADING = 0;
-  geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = 0;
+  geo_status.GEO_STATUS_COMPASS_HEADING = calculate_heading(current_coord.latitude, current_coord.longitude,
+                                                            scaled_dest_coord.latitude, scaled_dest_coord.longitude);
+  geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = calculate_distance(
+      current_coord.latitude, current_coord.longitude, scaled_dest_coord.latitude, scaled_dest_coord.longitude);
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {
