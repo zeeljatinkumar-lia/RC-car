@@ -11,6 +11,7 @@
 #include "Mockcan_bus_module.h"
 #include "Mockdriver_controller.h"
 #include "Mockgpio.h"
+#include "Mocksteer_processor.h"
 
 // Include the source we wish to test
 #include "periodic_callbacks.h"
@@ -31,14 +32,15 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led3_ExpectAndReturn(gpio);
 
   can_bus_module__init_ExpectAndReturn(can1, true);
+  steer_processor__obstacle_LEDs_init_Expect();
   periodic_callbacks__initialize();
 }
 
-void test__periodic_callbacks__10Hz(void) {
+void test__periodic_callbacks__100Hz(void) {
   // gpio_s gpio;
   // gpio__toggle_Expect(gpio);
   // board_io__get_led1_ExpectAndReturn(gpio);
   driver_controller__read_all_can_messages_Expect();
   driver_controller__send_cmd_to_motor_over_can_ExpectAndReturn(true);
-  periodic_callbacks__10Hz(0);
+  periodic_callbacks__100Hz(0);
 }
