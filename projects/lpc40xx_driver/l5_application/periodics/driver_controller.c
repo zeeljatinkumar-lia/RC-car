@@ -7,7 +7,11 @@
 
 #include "stdio.h"
 
+#include "LCD_process.h"
+
 #define MIA_LED board_io__get_led3()
+
+static void update_data_for_LCD_debug(void);
 
 const dbc_ULTRASONIC_TO_DRIVER_s dbc_mia_replacement_ULTRASONIC_TO_DRIVER = {
     .ULTRASONIC_TO_DRIVER_front = 100, .ULTRASONIC_TO_DRIVER_left = 100, .ULTRASONIC_TO_DRIVER_right = 100};
@@ -46,12 +50,18 @@ void print_heading_and_motor_cmds() {
          geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION, motor_val.DRIVER_TO_MOTOR_steer,
          motor_val.DRIVER_TO_MOTOR_speed);
 }
+void update_data_for_LCD_debug(void) {
+  // TODO:zeel pass geo and sensor data to LCD
+  update_sensor_for_LCD(&sensor_val);
+  update_compass_for_LCD(&motor_val);
+}
 
 void driver_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   while (can__rx(can1, &msg, 0)) {
     driver_controller__decode_sensor_message(&msg);
     driver_controller__decode_geo_message(&msg);
+    update_data_for_LCD_debug();
 
     // perform the actual driver logic here
     steer_processor(&motor_val, sensor_val, geo_heading);
