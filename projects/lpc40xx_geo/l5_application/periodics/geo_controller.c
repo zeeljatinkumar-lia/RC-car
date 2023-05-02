@@ -23,7 +23,7 @@ static dbc_GPS_DESTINATION_s dest_coord;
 static void geo_controller__manage_mia() {
   const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_GPS_DESTINATION(&dest_coord, mia_increment_value)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
+    gpio__set(MIA_LED); // turn ON to indicate MIA
   }
 }
 
@@ -46,7 +46,7 @@ void geo_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   while (can__rx(can1, &msg, 0)) {
     geo_controller__decode_bridge_message(&msg);
-    gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    gpio__reset(MIA_LED); // turn OFF since we received the CAN message
   }
   geo_controller__manage_mia();
 }

@@ -21,7 +21,7 @@ static dbc_MOTOR_TO_APP_DBG_s speed_val;
 static void motor_controller__manage_mia() {
   const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_DRIVER_TO_MOTOR(&motor_val, mia_increment_value)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
+    gpio__set(MIA_LED); // turn ON to indicate MIA
   }
 }
 
@@ -58,7 +58,7 @@ void motor_controller__read_all_can_messages() {
   // motor_controller__run_motor();
   rpm_sensor__update_speed_value(&speed_val);
   while (can__rx(can1, &msg, 0)) {
-    gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    gpio__reset(MIA_LED); // turn OFF since we received the CAN message
     header.message_dlc = msg.frame_fields.data_len;
     header.message_id = msg.msg_id;
     dbc_decode_DRIVER_TO_MOTOR(&motor_val, header, msg.data.bytes);
