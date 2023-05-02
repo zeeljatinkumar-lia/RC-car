@@ -13,7 +13,7 @@ static gpio_s GPS_LOCK_LED;
 
 const dbc_GPS_DESTINATION_s dbc_mia_replacement_GPS_DESTINATION = {.GPS_DEST_LATITUDE_SCALED_100000 = 0,
                                                                    .GPS_DEST_LONGITUDE_SCALED_100000 = 0};
-const uint32_t dbc_mia_threshold_GPS_DESTINATION = 100;
+const uint32_t dbc_mia_threshold_GPS_DESTINATION = 1500;
 
 static gps_coordinates_t current_coord;
 static dbc_GEO_CURRENT_COORDS_s current_coord_to_bridge;
@@ -21,7 +21,7 @@ static dbc_GEO_STATUS_s geo_status;
 static dbc_GPS_DESTINATION_s dest_coord;
 
 static void geo_controller__manage_mia() {
-  const uint32_t mia_increment_value = 10;
+  const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_GPS_DESTINATION(&dest_coord, mia_increment_value)) {
     gpio__reset(MIA_LED); // turn ON to indicate MIA
   }

@@ -13,13 +13,13 @@ static gpio_s MIA_LED;
 const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {.DRIVER_TO_MOTOR_speed = 9,
                                                                    .DRIVER_TO_MOTOR_steer = 0};
 
-const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 100;
+const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 1500;
 
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 static dbc_MOTOR_TO_APP_DBG_s speed_val;
 
 static void motor_controller__manage_mia() {
-  const uint32_t mia_increment_value = 10;
+  const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_DRIVER_TO_MOTOR(&motor_val, mia_increment_value)) {
     gpio__reset(MIA_LED); // turn ON to indicate MIA
   }

@@ -5,7 +5,8 @@
 #include "steering.h"
 
 #define CAR_STOP_DISTANCE_THRESHOLD 10 // unit meters
-#define REVERSE_SPEED -10
+
+static int REVERSE_SPEED = -1 * THROTTLE_LEVEL_2;
 
 static gpio_s FRONT_OBSTACLE_LED;
 static gpio_s LEFT_OBSTACLE_LED;

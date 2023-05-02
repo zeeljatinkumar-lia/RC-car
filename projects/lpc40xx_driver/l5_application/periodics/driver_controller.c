@@ -15,14 +15,14 @@ static void update_data_for_LCD_debug(void);
 
 const dbc_ULTRASONIC_TO_DRIVER_s dbc_mia_replacement_ULTRASONIC_TO_DRIVER = {
     .ULTRASONIC_TO_DRIVER_front = 100, .ULTRASONIC_TO_DRIVER_left = 100, .ULTRASONIC_TO_DRIVER_right = 100};
-const uint32_t dbc_mia_threshold_ULTRASONIC_TO_DRIVER = 100;
+const uint32_t dbc_mia_threshold_ULTRASONIC_TO_DRIVER = 1500;
 
 static dbc_ULTRASONIC_TO_DRIVER_s sensor_val;
 static dbc_GEO_STATUS_s geo_heading;
 static dbc_DRIVER_TO_MOTOR_s motor_val;
 
 static void driver_controller__manage_mia() {
-  const uint32_t mia_increment_value = 10;
+  const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_ULTRASONIC_TO_DRIVER(&sensor_val, mia_increment_value)) {
     gpio__reset(MIA_LED); // turn ON to indicate MIA
   }
