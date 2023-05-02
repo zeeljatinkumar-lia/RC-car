@@ -32,6 +32,7 @@ void test__periodic_callbacks__initialize(void) {
   gpio__set_Expect(gpio);
   board_io__get_led3_ExpectAndReturn(gpio);
 
+  motor_controller__init_Expect();
   can_bus_module__init_ExpectAndReturn(can1, true);
   rpm_sensor__init_Expect();
   motor__init_Expect();

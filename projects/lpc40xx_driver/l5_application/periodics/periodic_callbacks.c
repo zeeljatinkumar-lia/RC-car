@@ -26,6 +26,7 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
+  driver_controller__init();
   steer_processor__obstacle_LEDs_init();
   I2C_init();
   // reset__LCD();

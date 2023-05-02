@@ -36,6 +36,7 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led3_ExpectAndReturn(gpio);
 
   can_bus_module__init_ExpectAndReturn(can1, true);
+  driver_controller__init_Expect();
   steer_processor__obstacle_LEDs_init_Expect();
   I2C_init_Expect();
 

@@ -8,7 +8,7 @@
 #include "waypoints.h"
 #include <stdio.h>
 
-#define MIA_LED board_io__get_led3()
+static gpio_s MIA_LED;
 static gpio_s GPS_LOCK_LED;
 
 const dbc_GPS_DESTINATION_s dbc_mia_replacement_GPS_DESTINATION = {.GPS_DEST_LATITUDE_SCALED_100000 = 0,
@@ -113,12 +113,15 @@ bool geo_controller__send_current_coord_to_bridge_over_can() {
   return tx_status;
 }
 
-static void geo_controller__gps_lock_LED_init() { GPS_LOCK_LED = gpio__construct_as_output(GPIO__PORT_2, 0); }
+static void geo_controller__LED_init() {
+  GPS_LOCK_LED = gpio__construct_as_output(GPIO__PORT_2, 0);
+  MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17);
+}
 
 void geo_controller__init() {
   gps__init();
   compass_init();
-  geo_controller__gps_lock_LED_init();
+  geo_controller__LED_init();
 }
 
 void geo_controller__gps_lock_LED_update() {

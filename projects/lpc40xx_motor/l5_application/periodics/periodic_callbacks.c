@@ -20,6 +20,7 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led1());
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
+  motor_controller__init();
   can_bus_module__init(can1);
   rpm_sensor__init();
   motor__init();

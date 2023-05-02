@@ -9,7 +9,7 @@
 
 #include "LCD_process.h"
 
-#define MIA_LED board_io__get_led3()
+static gpio_s MIA_LED;
 
 static void update_data_for_LCD_debug(void);
 
@@ -24,7 +24,7 @@ static dbc_DRIVER_TO_MOTOR_s motor_val;
 static void driver_controller__manage_mia() {
   const uint32_t mia_increment_value = 10;
   if (dbc_service_mia_ULTRASONIC_TO_DRIVER(&sensor_val, mia_increment_value)) {
-    // gpio__reset(MIA_LED); // turn ON to indicate MIA
+    gpio__reset(MIA_LED); // turn ON to indicate MIA
   }
 }
 
@@ -45,11 +45,14 @@ static void driver_controller__encode_motor_message(can__msg_t *msg) {
   msg->msg_id = header.message_id;
 }
 
+void driver_controller__init() { MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17); }
+
 void print_heading_and_motor_cmds() {
   printf("heading=%d, dist=%f, steer=%d, speed=%d\n", geo_heading.GEO_STATUS_COMPASS_HEADING,
          geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION, motor_val.DRIVER_TO_MOTOR_steer,
          motor_val.DRIVER_TO_MOTOR_speed);
 }
+
 void update_data_for_LCD_debug(void) {
   // TODO:zeel pass geo and sensor data to LCD
   update_sensor_for_LCD(&sensor_val);
@@ -66,7 +69,7 @@ void driver_controller__read_all_can_messages() {
     // perform the actual driver logic here
     steer_processor(&motor_val, sensor_val, geo_heading);
 
-    // gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
   driver_controller__manage_mia();
 }

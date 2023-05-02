@@ -8,7 +8,7 @@
 #include "rpm.h"
 #include <stdio.h>
 
-#define MIA_LED board_io__get_led3()
+static gpio_s MIA_LED;
 
 const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {.DRIVER_TO_MOTOR_speed = 9,
                                                                    .DRIVER_TO_MOTOR_steer = 0};
@@ -92,3 +92,5 @@ bool motor_controller__send_motor_speed_over_can() {
   }
   return tx_status;
 }
+
+void motor_controller__init() { MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17); }
