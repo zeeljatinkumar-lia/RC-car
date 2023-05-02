@@ -31,10 +31,10 @@ void Sensor_Controller__print_sensor_values() {
 }
 
 static void update_obstacle_LED(int sensor_value, gpio_s obstacle_led) {
-  if (sensor_value > 150) { // no obstacle detected. Turn OFF LED
-    gpio__set(obstacle_led);
+  if (sensor_value > 100) { // no obstacle detected. Turn OFF LED
+    gpio__reset(obstacle_led);
   } else {
-    gpio__reset(obstacle_led); // obstacle detected. Turn ON LED
+    gpio__set(obstacle_led); // obstacle detected. Turn ON LED
   }
 }
 

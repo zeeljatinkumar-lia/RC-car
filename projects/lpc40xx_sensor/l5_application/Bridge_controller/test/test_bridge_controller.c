@@ -56,6 +56,6 @@ void test_bridge_controller_transmit_value_to_app(void) {
 
 void test_bridge_can_mia_handler(void) {
   compass_value_to_app.mia_info.mia_counter = 1400;
-  gpio__reset_ExpectAnyArgs();
+  gpio__set_ExpectAnyArgs();
   bridge_can_mia_handler();
 }

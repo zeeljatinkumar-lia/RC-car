@@ -150,7 +150,7 @@ void CAN_RX_MSGS_FOR_BRIDGE(void) {
   can__msg_t can_msg = {0};
   while (can__rx(can1, &can_msg, 0)) {
     bridge_controller__decode_geo_message(&can_msg);
-    gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    gpio__reset(MIA_LED); // turn OFF since we received the CAN message
   }
 }
 
@@ -168,6 +168,6 @@ void bridge_controller__decode_geo_message(can__msg_t *msg) {
 void bridge_can_mia_handler(void) {
   const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_GEO_STATUS(&compass_value_to_app, mia_increment_value)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
+    gpio__set(MIA_LED); // turn ON to indicate MIA
   }
 }
