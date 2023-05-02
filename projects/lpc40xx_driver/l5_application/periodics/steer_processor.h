@@ -25,11 +25,13 @@ typedef enum steer_angle_level {
 } steer_angle_level_t;
 
 typedef enum obstacle_threshold_level {
+  OBSTACLE_THRESHOLD_LEVEL_0 = 0,
   OBSTACLE_THRESHOLD_LEVEL_1 = 50,  // unit cm
   OBSTACLE_THRESHOLD_LEVEL_2 = 75,  // unit cm
   OBSTACLE_THRESHOLD_LEVEL_3 = 100, // unit cm
-  OBSTACLE_THRESHOLD_LEVEL_4 = 150, // unit cm
+  NO_OBSTACLE = 150,                // unit cm
 } obstacle_threshold_level_t;
 
 void steer_processor(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_ULTRASONIC_TO_DRIVER_s sensor_val,
                      dbc_GEO_STATUS_s geo_heading);
+void steer_processor__obstacle_LEDs_init();

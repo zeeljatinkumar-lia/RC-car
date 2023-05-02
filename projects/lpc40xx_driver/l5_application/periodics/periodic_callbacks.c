@@ -5,6 +5,7 @@
 #include "can_bus_module.h"
 #include "driver_controller.h"
 #include "gpio.h"
+#include "steer_processor.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -19,6 +20,7 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
+  steer_processor__obstacle_LEDs_init();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
@@ -27,8 +29,7 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
   print_heading_and_motor_cmds();
 }
 
-void periodic_callbacks__10Hz(uint32_t callback_count) {
-}
+void periodic_callbacks__10Hz(uint32_t callback_count) {}
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());

@@ -85,8 +85,10 @@ bool motor_controller__send_motor_speed_over_can() {
   motor_controller__encode_speed_message(&msg);
   tx_status = can__tx(can1, &msg, 0);
   if (tx_status) {
-    // Toggle LED0 for each successful transmission
-    gpio__toggle(board_io__get_led0());
+    // Turn ON LED0 if successful transmission
+    gpio__reset(board_io__get_led0());
+  } else {
+    gpio__set(board_io__get_led0());
   }
   return tx_status;
 }
