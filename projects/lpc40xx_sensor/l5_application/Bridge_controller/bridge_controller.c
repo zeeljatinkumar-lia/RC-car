@@ -2,7 +2,6 @@
 #include "FreeRTOS.h"
 #include "clock.h"
 
-#include "board_io.h"
 #include "can_bus.h"
 
 #include "gpio.h"
@@ -17,6 +16,8 @@
 #include <stdio.h>
 
 #include "LV_sensor_controller.h"
+
+static gpio_s MIA_LED;
 
 static dbc_GPS_DESTINATION_s gps_destination_location;
 static dbc_GPS_DESTINATION_s gps_destination_location_last_sent;
@@ -38,6 +39,8 @@ static void bridge_controller__decode_geo_message(can__msg_t *msg);
 void bridge_controller_handler__parse_gps_data(void);
 
 void Bridge_Controller_init(void) {
+  MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17);
+
   gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000 = 0.0;
   gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000 = 0.0;
   gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000 = 0.0;
@@ -112,7 +115,6 @@ void bridge_controller_handler__parse_gps_data(void) {
   sscanf(temp_line_buffer, "GPS%ld,%ld#", &gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
          &gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
 
-
   if (gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000 != 0 &&
       gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000 != 0 && !gps_dest_data_latched) {
 
@@ -148,6 +150,7 @@ void CAN_RX_MSGS_FOR_BRIDGE(void) {
   can__msg_t can_msg = {0};
   while (can__rx(can1, &can_msg, 0)) {
     bridge_controller__decode_geo_message(&can_msg);
+    gpio__set(MIA_LED); // turn OFF since we received the CAN message
   }
 }
 
@@ -165,6 +168,6 @@ void bridge_controller__decode_geo_message(can__msg_t *msg) {
 void bridge_can_mia_handler(void) {
   const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_GEO_STATUS(&compass_value_to_app, mia_increment_value)) {
-    gpio__toggle(board_io__get_led3());
+    gpio__reset(MIA_LED); // turn ON to indicate MIA
   }
 }
