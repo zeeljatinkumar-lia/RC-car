@@ -8,12 +8,12 @@
 #include "waypoints.h"
 #include <stdio.h>
 
-#define MIA_LED board_io__get_led3()
+static gpio_s MIA_LED;
 static gpio_s GPS_LOCK_LED;
 
 const dbc_GPS_DESTINATION_s dbc_mia_replacement_GPS_DESTINATION = {.GPS_DEST_LATITUDE_SCALED_100000 = 0,
                                                                    .GPS_DEST_LONGITUDE_SCALED_100000 = 0};
-const uint32_t dbc_mia_threshold_GPS_DESTINATION = 100;
+const uint32_t dbc_mia_threshold_GPS_DESTINATION = 1500;
 
 static gps_coordinates_t current_coord;
 static dbc_GEO_CURRENT_COORDS_s current_coord_to_bridge;
@@ -21,9 +21,9 @@ static dbc_GEO_STATUS_s geo_status;
 static dbc_GPS_DESTINATION_s dest_coord;
 
 static void geo_controller__manage_mia() {
-  const uint32_t mia_increment_value = 10;
+  const uint32_t mia_increment_value = 100;
   if (dbc_service_mia_GPS_DESTINATION(&dest_coord, mia_increment_value)) {
-    gpio__reset(MIA_LED); // turn ON to indicate MIA
+    gpio__set(MIA_LED); // turn ON to indicate MIA
   }
 }
 
@@ -46,7 +46,7 @@ void geo_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   while (can__rx(can1, &msg, 0)) {
     geo_controller__decode_bridge_message(&msg);
-    gpio__set(MIA_LED); // turn OFF since we received the CAN message
+    gpio__reset(MIA_LED); // turn OFF since we received the CAN message
   }
   geo_controller__manage_mia();
 }
@@ -113,12 +113,15 @@ bool geo_controller__send_current_coord_to_bridge_over_can() {
   return tx_status;
 }
 
-static void geo_controller__gps_lock_LED_init() { GPS_LOCK_LED = gpio__construct_as_output(GPIO__PORT_2, 0); }
+static void geo_controller__LED_init() {
+  GPS_LOCK_LED = gpio__construct_as_output(GPIO__PORT_2, 0);
+  MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17);
+}
 
 void geo_controller__init() {
   gps__init();
   compass_init();
-  geo_controller__gps_lock_LED_init();
+  geo_controller__LED_init();
 }
 
 void geo_controller__gps_lock_LED_update() {

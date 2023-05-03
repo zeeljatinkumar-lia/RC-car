@@ -6,6 +6,8 @@
 #include "Mockgpio.h"
 #include "Mocksteer_processor.h"
 
+#include "MockLCD_process.h"
+
 #include "driver_controller.c"
 
 void setUp() { memset(&sensor_val, 0, sizeof(sensor_val)); }
@@ -54,7 +56,12 @@ void test_driver_controller__read_one_messages() {
   can__rx_IgnoreArg_can_message_ptr();
   can__rx_ExpectAndReturn(can1, NULL, 0, false);
   can__rx_IgnoreArg_can_message_ptr();
+
   steer_processor_Expect(&motor_val, sensor_val, geo_heading);
+  update_sensor_for_LCD_Expect(&sensor_val);
+  update_compass_for_LCD_Expect(&geo_heading);
+  update_motor_for_LCD_Expect(&motor_val);
+
   driver_controller__read_all_can_messages();
 }
 

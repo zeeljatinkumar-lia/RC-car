@@ -14,10 +14,8 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_geo_controller__mia_happens() {
-  gpio_s gpio;
-  dest_coord.mia_info.mia_counter = 90;
-  board_io__get_led3_ExpectAndReturn(gpio);
-  gpio__reset_Expect(gpio);
+  dest_coord.mia_info.mia_counter = 1400;
+  gpio__set_Expect(MIA_LED);
   geo_controller__manage_mia();
 }
 
@@ -44,13 +42,11 @@ void test_geo_controller__read_zero_messages() {
 }
 
 void test_geo_controller__read_one_messages() {
-  gpio_s gpio;
   can__rx_ExpectAndReturn(can1, NULL, 0, true);
   can__rx_IgnoreArg_can_message_ptr();
   can__rx_ExpectAndReturn(can1, NULL, 0, false);
   can__rx_IgnoreArg_can_message_ptr();
-  board_io__get_led3_ExpectAndReturn(gpio);
-  gpio__set_Expect(gpio);
+  gpio__reset_Expect(MIA_LED);
   geo_controller__read_all_can_messages();
 }
 

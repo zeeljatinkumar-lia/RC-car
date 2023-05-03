@@ -13,6 +13,10 @@
 #include "Mockgpio.h"
 #include "Mocksteer_processor.h"
 
+#include "MockLCD_init.h"
+#include "MockLCD_process.h"
+#include "Mocki2c_init.h"
+
 // Include the source we wish to test
 #include "periodic_callbacks.h"
 
@@ -32,8 +36,22 @@ void test__periodic_callbacks__initialize(void) {
   board_io__get_led3_ExpectAndReturn(gpio);
 
   can_bus_module__init_ExpectAndReturn(can1, true);
+  driver_controller__init_Expect();
   steer_processor__obstacle_LEDs_init_Expect();
+  I2C_init_Expect();
+
+  set_LCD_to_4_bit_mode_Expect();
+  init__LCD_Expect();
+
   periodic_callbacks__initialize();
+}
+
+void test_periodic_callbacks__1Hz(uint32_t callback_count) {
+  // gpio__toggle(board_io__get_led0());
+  can_bus_module__check_for_bus_off_IgnoreAndReturn(can1);
+  print_heading_and_motor_cmds_Ignore();
+  LCD_display_1Hz_Expect();
+  periodic_callbacks__1Hz(0);
 }
 
 void test__periodic_callbacks__100Hz(void) {

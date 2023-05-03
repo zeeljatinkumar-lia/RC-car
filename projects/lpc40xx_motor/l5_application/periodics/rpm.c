@@ -15,6 +15,7 @@ static const float circumference_of_wheel_cm = 34.56f;
 static const float wheel_to_gear_ratio = 2.125f;
 static float kph_scalar = (circumference_of_wheel_cm * 3600) / (wheel_to_gear_ratio * 100000);
 static float speed_in_kph;
+static float speed_in_mph;
 
 static void timer2_isr(void) {
   LPC_TIM2->TC = 0;
@@ -41,7 +42,9 @@ void rpm_sensor__update_speed_value(dbc_MOTOR_TO_APP_DBG_s *speed_val) {
   if (timer_counter_value > timer_counter_upper_bound || timer_capture_value == 0) {
     speed_in_kph = 0.0f;
   }
-  float speed_in_mph = speed_in_kph * 0.6214;
+  speed_in_mph = speed_in_kph * 0.6214;
   speed_val->MOTOR_TO_APP_DBG_current_speed = speed_in_mph;
-  printf("speed_in_kph %f kph_scalar=%f timer_capture_value=%d \n ", speed_in_kph, kph_scalar, timer_capture_value);
+  // printf("speed_in_kph %f kph_scalar=%f timer_capture_value=%d \n ", speed_in_kph, kph_scalar, timer_capture_value);
 }
+
+float rpm_sensor__get_current_speed() { return speed_in_mph; }

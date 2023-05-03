@@ -7,6 +7,12 @@
 #include "gpio.h"
 #include "steer_processor.h"
 
+/*TODO:zeel LCD headers*/
+
+#include "LCD_init.h"
+#include "LCD_process.h"
+#include "i2c_init.h"
+
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
  * For 1Hz, the function must return within 1000ms
@@ -20,13 +26,18 @@ void periodic_callbacks__initialize(void) {
   gpio__set(board_io__get_led2());
   gpio__set(board_io__get_led3());
   can_bus_module__init(can1);
+  driver_controller__init();
   steer_processor__obstacle_LEDs_init();
+  I2C_init();
+  set_LCD_to_4_bit_mode();
+  init__LCD();
 }
 
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led0());
   can_bus_module__check_for_bus_off(can1);
   print_heading_and_motor_cmds();
+  LCD_display_1Hz();
 }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {}
