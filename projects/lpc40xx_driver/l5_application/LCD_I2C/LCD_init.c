@@ -4,84 +4,55 @@
 #include "string.h"
 
 #define LCD_ID 0x4E // New device ID(New LCD Poggers)
-/*Command shortcuts*/
-#define LINE1 0x80 // Starting address for screen ROW 0, Column 0
-#define LINE2 0xC0 // Starting address for screen ROW 1, Column 0
-#define LINE3 0x94 // Starting address for screen ROW 1, Column 0
-#define LINE4 0xD4 // Starting address for screen ROW 1, Column 0
-
-#define FOUR_BIT_MODE 0x20
-#define EIGHT_BIT_MODE 0x30
-#define DISPLAY_AND_CURSOR 0x0C
-
-#define CLEAR_SCREEN 0x01 // Clear contents on screen and reset cursor to ROW0, Column 0.
-#define AUTOINCREMENT_CURSOR 0x06
-
-/*Define Control bit registers*/
-#define RS 0x01 // D0 - Read(0)/Write(1) mode to internal DDRAM
-#define RW 0x02 // D1 - Read Busy Flag
-#define E 0x04  // D2 - Enable for pulsing
-#define BL 0x08 // D3 - Backlight of LCD (1)ON (0) OFF
 
 static const i2c_e LCD_I2C_bus = I2C__2;
 
-void init__LCD(void) {
-  /*Set function to 4-bit interfacing mode*/
-
-  delay__ms(50);
-  send_LCD_command(EIGHT_BIT_MODE);
-  delay__ms(5);
-  send_LCD_command(EIGHT_BIT_MODE);
-  delay__ms(1);
-  send_LCD_command(EIGHT_BIT_MODE);
-  delay__ms(10);
-  send_LCD_command(FOUR_BIT_MODE); // 4bit mode
-  delay__ms(10);
-
-  send_LCD_command(0x28); // Function set
-  delay__ms(1);
-  send_LCD_command(DISPLAY_AND_CURSOR);
-  delay__ms(1);
-  send_LCD_command(CLEAR_SCREEN);
-  ; // clear
-  delay__ms(1);
-  delay__ms(1);
-  send_LCD_command(AUTOINCREMENT_CURSOR);
-  ; // Entry mode set
-
-  // return i2c__detect(I2C__2,0x27);
-}
-/*
-void LCD__reset(void) {
+void set_LCD_to_4_bit_mode(void) {
   uint8_t Reg = 0x00;
-
+  delay__ms(50);
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x3C); // 0x30
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x38);
 
-  i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x3C); // 0x30
-  i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x38);
+  delay__ms(5);
 
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x3C); // 0x30
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x38);
-
+  delay__ms(1);
+  i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x3C); // 0x30
+  i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x38);
+  delay__ms(10);
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x2C); // 0x20
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, 0x28);
 
   delay__ms(10);
 }
-*/
+
+void init__LCD(void) {
+  /* delays in between commands to let commands process*/
+
+  send_LCD_command(0x28); // Function set
+  delay__ms(1);
+  send_LCD_command(0x0C); // Display on
+  delay__ms(1);
+  send_LCD_command(0x01); // clear the screen
+  delay__ms(1);
+  send_LCD_command(0x06); // turn on auto-increment
+  delay__ms(2);
+  send_LCD_command(0x80); // start of LCD
+  delay__ms(2);
+}
 
 void send_LCD_command(uint8_t command) {
   uint8_t byte, Reg = 0x00;
   /*Start with the upper nibble*/
   byte = (command & 0xF0);
-  byte |= 0x08;
-  byte |= 0x04;
+  byte |= 0x08; // backlight of LCD
+  byte |= 0x04; // Enable bit LCD
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, byte);
   byte &= ~0x04;
   byte |= 0x08;
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, byte);
-  /*Now do the lower nibble*/
+  /*lower nibble*/
   byte = (command & 0x0F) << 4;
   byte |= 0x08;
   byte |= 0x04;
@@ -89,7 +60,6 @@ void send_LCD_command(uint8_t command) {
   byte &= ~0x04;
   byte |= 0x08;
   i2c__write_single(LCD_I2C_bus, LCD_ID, Reg, byte);
-  // Delay to process commands
   delay__ms(3);
 }
 

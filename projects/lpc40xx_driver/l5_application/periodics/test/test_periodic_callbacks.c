@@ -13,9 +13,9 @@
 #include "Mockgpio.h"
 #include "Mocksteer_processor.h"
 
-#include "MockI2C_init.h"
 #include "MockLCD_init.h"
 #include "MockLCD_process.h"
+#include "Mocki2c_init.h"
 
 // Include the source we wish to test
 #include "periodic_callbacks.h"
@@ -40,6 +40,7 @@ void test__periodic_callbacks__initialize(void) {
   steer_processor__obstacle_LEDs_init_Expect();
   I2C_init_Expect();
 
+  set_LCD_to_4_bit_mode_Expect();
   init__LCD_Expect();
 
   periodic_callbacks__initialize();

@@ -56,7 +56,8 @@ void print_heading_and_motor_cmds() {
 void update_data_for_LCD_debug(void) {
   // TODO:zeel pass geo and sensor data to LCD
   update_sensor_for_LCD(&sensor_val);
-  update_compass_for_LCD(&motor_val);
+  update_compass_for_LCD(&geo_heading);
+  update_motor_for_LCD(&motor_val);
 }
 
 void driver_controller__read_all_can_messages() {
@@ -64,10 +65,10 @@ void driver_controller__read_all_can_messages() {
   while (can__rx(can1, &msg, 0)) {
     driver_controller__decode_sensor_message(&msg);
     driver_controller__decode_geo_message(&msg);
-    update_data_for_LCD_debug();
 
     // perform the actual driver logic here
     steer_processor(&motor_val, sensor_val, geo_heading);
+    update_data_for_LCD_debug();
 
     gpio__reset(MIA_LED); // turn OFF since we received the CAN message
   }

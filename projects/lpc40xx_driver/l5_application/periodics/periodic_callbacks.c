@@ -9,9 +9,9 @@
 
 /*TODO:zeel LCD headers*/
 
-#include "I2C_init.h"
 #include "LCD_init.h"
 #include "LCD_process.h"
+#include "i2c_init.h"
 
 /******************************************************************************
  * Your board will reset if the periodic function does not return within its deadline
@@ -29,7 +29,7 @@ void periodic_callbacks__initialize(void) {
   driver_controller__init();
   steer_processor__obstacle_LEDs_init();
   I2C_init();
-  // reset__LCD();
+  set_LCD_to_4_bit_mode();
   init__LCD();
 }
 

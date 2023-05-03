@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "I2C_init.h"
 #include "clock.h"
-#include "gpio.h"
+#include "i2c_init.h"
+
 #include "i2c.h"
 
 static const uint8_t lcd_ID = 0x4E;
