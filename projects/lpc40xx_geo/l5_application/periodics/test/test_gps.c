@@ -30,6 +30,7 @@ static void set_init_expectations() {
   xQueueCreate_ExpectAndReturn(100, sizeof(char), rxq_handle);
   xQueueCreate_ExpectAndReturn(100, sizeof(char), txq_handle);
   uart__enable_queues_ExpectAndReturn(gps_uart, rxq_handle, txq_handle, true);
+  uart__polled_put_IgnoreAndReturn(true);
   gps__init();
 }
 

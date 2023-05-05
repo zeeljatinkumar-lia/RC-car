@@ -77,15 +77,15 @@ static void compass__calculate_current_heading(float mag[3]) {
 
 static void compass__read() {
   uint8_t buffer[6];
-  i2c__read_slave_data(current_i2c, magnetometer_read, LSM303AGR_MAG_OUTX_L_REG, buffer, 6);
+  if (i2c__read_slave_data(current_i2c, magnetometer_read, LSM303AGR_MAG_OUTX_L_REG, buffer, 6) == true) {
+    mag[0] = (int16_t)(buffer[1] << 8 | buffer[0]);
+    mag[1] = (int16_t)(buffer[3] << 8 | buffer[2]);
+    mag[2] = (int16_t)(buffer[5] << 8 | buffer[4]);
 
-  mag[0] = (int16_t)(buffer[1] << 8 | buffer[0]);
-  mag[1] = (int16_t)(buffer[3] << 8 | buffer[2]);
-  mag[2] = (int16_t)(buffer[5] << 8 | buffer[4]);
-
-  compass__transformation_mag(mag);
-  // printf("x %f, y %f, z %f\n", mag[0], mag[1], mag[2]);
-  compass__calculate_current_heading(mag);
+    compass__transformation_mag(mag);
+    // printf("x %f, y %f, z %f\n", mag[0], mag[1], mag[2]);
+    compass__calculate_current_heading(mag);
+  }
 }
 
 float compass__get_current_bearing() {

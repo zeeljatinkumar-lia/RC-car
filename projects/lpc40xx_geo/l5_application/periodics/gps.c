@@ -24,6 +24,23 @@ static line_buffer_s line;
 static gps_coordinates_t parsed_coordinates;
 static bool satellite_lock_status;
 
+static const char *SET_GPGGA_ONLY = "$PMTK314,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n";
+static const char *SET_8HZ_UPDATES = "$PMTK220,120*2D\r\n";
+
+static void gps__set_config_gpgga_only() {
+  int i = 0;
+  while (SET_GPGGA_ONLY[i] != '\0') {
+    uart__polled_put(gps_uart, SET_GPGGA_ONLY[i++]);
+  }
+}
+
+static void gps__set_config_update_rate_to_8Hz() {
+  int i = 0;
+  while (SET_GPGGA_ONLY[i] != '\0') {
+    uart__polled_put(gps_uart, SET_8HZ_UPDATES[i++]);
+  }
+}
+
 static void gps__transfer_data_from_uart_driver_to_line_buffer(void) {
   char byte = 0;
   const uint32_t zero_timeout = 0;
@@ -85,7 +102,7 @@ static void gps__coordinate_parser(char *str) {
     }
     parsed_coordinates.latitude = latitude / 100;
     parsed_coordinates.longitude = longitude / 100;
-    printf("lat %f, long %f\n", parsed_coordinates.latitude, parsed_coordinates.longitude);
+    // printf("lat %f, long %f\n", parsed_coordinates.latitude, parsed_coordinates.longitude);
   }
 }
 
@@ -93,7 +110,7 @@ static void gps__parse_coordinates_from_line(void) {
   char gps_line[200] = {0};
 
   if (line_buffer__remove_line(&line, gps_line, sizeof(gps_line))) {
-    // printf("gps_line=%s", gps_line);
+    // printf("gps_line=%s\n", gps_line);
     gps__coordinate_parser(gps_line);
   }
 }
@@ -112,6 +129,12 @@ void gps__init(void) {
   QueueHandle_t rxq_handle = xQueueCreate(100, sizeof(char));
   QueueHandle_t txq_handle = xQueueCreate(100, sizeof(char)); // We are using tx queue for transmitting in fake_gps
   uart__enable_queues(gps_uart, rxq_handle, txq_handle);
+
+  // set GPS sensor to send data only in $GPGGA format
+  gps__set_config_gpgga_only();
+
+  // set the update rate of GPS sensor to 8Hz (the default is only 1Hz)
+  gps__set_config_update_rate_to_8Hz();
 }
 
 void gps__get_gps_data_and_parse_coordinates(void) {
