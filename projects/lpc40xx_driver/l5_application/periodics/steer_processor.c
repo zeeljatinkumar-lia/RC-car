@@ -110,7 +110,7 @@ static int get_speed_level_based_on_obstacle_distance(void) {
   speed_throttle_level_t speed_level;
   switch (closest_obstacle_threshold_ahead) {
   case OBSTACLE_THRESHOLD_LEVEL_0:
-    speed_level = THROTTLE_LEVEL_0;
+    speed_level = THROTTLE_LEVEL_1;
     break;
   case OBSTACLE_THRESHOLD_LEVEL_1:
     speed_level = THROTTLE_LEVEL_1;

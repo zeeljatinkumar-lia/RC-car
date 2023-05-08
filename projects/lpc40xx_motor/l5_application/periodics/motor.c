@@ -129,8 +129,9 @@ void motor__run_dc_motor_by_speed(float speed) {
   if (motor__if_direction_reversed(speed)) {
     // we need to change the direction
     motor__brake();
-    float reversing_pwm = motor__convert_speed_to_pwm(previous_speed * -1.0);
-    pwm1__set_duty_cycle(DC_MOTOR, reversing_pwm);
+    // float reversing_pwm = motor__convert_speed_to_pwm(previous_speed * -1.0);
+    // pwm1__set_duty_cycle(DC_MOTOR, reversing_pwm);
+    pwm1__set_duty_cycle(DC_MOTOR, 13.5);
     motor__brake();
   }
   pwm = motor__convert_speed_to_pwm(speed);
