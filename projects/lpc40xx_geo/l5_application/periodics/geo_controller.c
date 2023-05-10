@@ -36,9 +36,9 @@ void geo_controller__print_coord_and_heading_values() {
   gps_coordinates_t scaled_dest_coord = {0};
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
-  printf("cur lat %f, cur long %f, dest lat %f, dest long %f\n", current_coord.latitude, current_coord.longitude,
+  printf("cur lat:%f, cur long:%f, dest lat:%f, dest long:%f ", current_coord.latitude, current_coord.longitude,
          scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-  printf("dist: %f, heading: %d, bearing: %d\n\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
+  printf("dist: %fmeters, heading: %d, bearing: %d\n\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
          geo_status.GEO_STATUS_COMPASS_HEADING, geo_status.GEO_STATUS_COMPASS_BEARING);
 }
 
@@ -62,7 +62,7 @@ void geo_controller__calculate_heading() {
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
 
-  geo_status.GEO_STATUS_COMPASS_BEARING = get_current_compass_bearing();
+  geo_status.GEO_STATUS_COMPASS_BEARING = compass__get_current_bearing();
 
   geo_status.GEO_STATUS_COMPASS_HEADING =
       (uint16_t)waypoints__calculate_heading_to_next_point(current_coord, scaled_dest_coord);
@@ -120,7 +120,7 @@ static void geo_controller__LED_init() {
 
 void geo_controller__init() {
   gps__init();
-  compass_init();
+  compass__init();
   geo_controller__LED_init();
 }
 

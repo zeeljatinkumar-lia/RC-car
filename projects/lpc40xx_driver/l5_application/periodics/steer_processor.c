@@ -6,7 +6,7 @@
 
 #define CAR_STOP_DISTANCE_THRESHOLD 10 // unit meters
 
-static int REVERSE_SPEED = -1 * THROTTLE_LEVEL_2;
+static int REVERSE_SPEED = -1 * THROTTLE_LEVEL_3;
 
 static gpio_s FRONT_OBSTACLE_LED;
 static gpio_s LEFT_OBSTACLE_LED;
@@ -110,7 +110,7 @@ static int get_speed_level_based_on_obstacle_distance(void) {
   speed_throttle_level_t speed_level;
   switch (closest_obstacle_threshold_ahead) {
   case OBSTACLE_THRESHOLD_LEVEL_0:
-    speed_level = THROTTLE_LEVEL_0;
+    speed_level = THROTTLE_LEVEL_1;
     break;
   case OBSTACLE_THRESHOLD_LEVEL_1:
     speed_level = THROTTLE_LEVEL_1;
@@ -209,7 +209,29 @@ int get_speed_level_based_on_distance_to_destination(int destination_distance_me
 // Function to determine the steer angle based on the direction of the destination
 int get_steer_angle_based_on_destination_direction(int dest, int curr) {
   steer_angle_level_t steer = STEER_STRAIGHT;
-  // TODO : actual steer logic
+  int angle_difference = dest - curr;
+
+  if (angle_difference > 180) {
+    angle_difference -= 360;
+  } else if (angle_difference < -180) {
+    angle_difference += 360;
+  }
+
+  if (angle_difference > 60) {
+    return STEER_SHARP_RIGHT;
+  } else if (angle_difference > 45) {
+    return STEER_MEDIUM_RIGHT;
+  } else if (angle_difference > 30) {
+    return STEER_SOFT_RIGHT;
+  } else if (angle_difference < -60) {
+    return STEER_SHARP_LEFT;
+  } else if (angle_difference < -45) {
+    return STEER_MEDIUM_LEFT;
+  } else if (angle_difference < -30) {
+    return STEER_SOFT_LEFT;
+  } else {
+    return 0;
+  }
   return (int)steer;
 }
 

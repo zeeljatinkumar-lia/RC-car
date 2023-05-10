@@ -3,7 +3,6 @@
 #include "board_io.h"
 #include "can_bus.h"
 #include "can_bus_module.h"
-#include "compass.h"
 #include "geo_controller.h"
 #include "gpio.h"
 #include "gps.h"
