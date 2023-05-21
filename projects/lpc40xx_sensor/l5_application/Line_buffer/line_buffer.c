@@ -107,7 +107,7 @@ bool line_buffer__remove_line(line_buffer_s *buffer, char *line, size_t line_max
     // do nothing
   }
   // check buffer is not empty
-  else if (-1 != (new_line_location = scan_for_new_line_token(buffer, new_line_token))) {
+  /*else if (-1 != (new_line_location = scan_for_new_line_token(buffer, new_line_token))) {
     if (new_line_location < buffer->read_index) {
       int temp = buffer->max_size - buffer->read_index + new_line_location;
       if ((temp) < line_max_size) {
@@ -122,6 +122,8 @@ bool line_buffer__remove_line(line_buffer_s *buffer, char *line, size_t line_max
   } else if (is_circular_queue_full(buffer)) {
     return_value = dequeue_multiple(buffer, line, line_max_size - 1);
     (void)dequeue(buffer, &new_line_location);
-  }
+  }*/
+  return_value = dequeue_multiple(buffer, line, line_max_size - 1);
+  (void)dequeue(buffer, &new_line_location);
   return return_value;
 }
