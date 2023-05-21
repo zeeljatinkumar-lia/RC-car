@@ -36,9 +36,9 @@ void geo_controller__print_coord_and_heading_values() {
   gps_coordinates_t scaled_dest_coord = {0};
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
-  printf("cur lat:%f, cur long:%f, dest lat:%f, dest long:%f ", current_coord.latitude, current_coord.longitude,
-         scaled_dest_coord.latitude, scaled_dest_coord.longitude);
-  printf("dist: %fmeters, heading: %d, bearing: %d\n\n", geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
+  printf("cur lat:%f, cur long:%f, dest lat:%f, dest long:%f ", (double)current_coord.latitude,
+         (double)current_coord.longitude, (double)scaled_dest_coord.latitude, (double)scaled_dest_coord.longitude);
+  printf("dist: %fmeters, heading: %d, bearing: %d\n\n", (double)geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION,
          geo_status.GEO_STATUS_COMPASS_HEADING, geo_status.GEO_STATUS_COMPASS_BEARING);
 }
 
@@ -126,8 +126,8 @@ void geo_controller__init() {
 
 void geo_controller__gps_lock_LED_update() {
   if (geo_status.GEO_STATUS_SATELLITE_LOCKED) {
-    gpio__reset(GPS_LOCK_LED);         // turn ON to indicate GPS is locked
-    gpio__reset(board_io__get_led2()); // TODO: remove after LED is soldered
+    gpio__set(GPS_LOCK_LED);         // turn ON to indicate GPS is locked
+    gpio__set(board_io__get_led2()); // TODO: remove after LED is soldered
   } else {
     gpio__toggle(GPS_LOCK_LED);         // toggle to indicate GPS is still waiting for a fix
     gpio__toggle(board_io__get_led2()); // TODO: remove after LED is soldered

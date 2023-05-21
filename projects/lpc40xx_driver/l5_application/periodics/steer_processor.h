@@ -3,15 +3,12 @@
 #include "project.h"
 #include <stdint.h>
 
-#define SPEED_FULL_THROTTLE 8                      // unit kmph. should be a factor of 4
-#define THROTTLE_RESOUTION SPEED_FULL_THROTTLE / 4 // unit kmph
-
 typedef enum speed_throttle_level {
   THROTTLE_LEVEL_0 = 0,
-  THROTTLE_LEVEL_1 = THROTTLE_RESOUTION * 1,
-  THROTTLE_LEVEL_2 = THROTTLE_RESOUTION * 2,
-  THROTTLE_LEVEL_3 = THROTTLE_RESOUTION * 3,
-  THROTTLE_LEVEL_4 = THROTTLE_RESOUTION * 4,
+  THROTTLE_LEVEL_1 = 4,
+  THROTTLE_LEVEL_2 = 5,
+  THROTTLE_LEVEL_3 = 6,
+  THROTTLE_LEVEL_4 = 7,
 } speed_throttle_level_t;
 
 typedef enum steer_angle_level {

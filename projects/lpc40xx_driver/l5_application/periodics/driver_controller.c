@@ -14,7 +14,7 @@ static gpio_s MIA_LED;
 static void update_data_for_LCD_debug(void);
 
 const dbc_ULTRASONIC_TO_DRIVER_s dbc_mia_replacement_ULTRASONIC_TO_DRIVER = {
-    .ULTRASONIC_TO_DRIVER_front = 100, .ULTRASONIC_TO_DRIVER_left = 100, .ULTRASONIC_TO_DRIVER_right = 100};
+    .ULTRASONIC_TO_DRIVER_front = 30, .ULTRASONIC_TO_DRIVER_left = 30, .ULTRASONIC_TO_DRIVER_right = 30};
 const uint32_t dbc_mia_threshold_ULTRASONIC_TO_DRIVER = 1500;
 
 static dbc_ULTRASONIC_TO_DRIVER_s sensor_val;
@@ -48,8 +48,8 @@ static void driver_controller__encode_motor_message(can__msg_t *msg) {
 void driver_controller__init() { MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17); }
 
 void print_heading_and_motor_cmds() {
-  printf("heading=%d, dist=%f, steer=%d, speed=%d\n", geo_heading.GEO_STATUS_COMPASS_HEADING,
-         geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION, motor_val.DRIVER_TO_MOTOR_steer,
+  printf("heading=%d, dist=%f, steer=%d, speed=%ld\n", geo_heading.GEO_STATUS_COMPASS_HEADING,
+         (double)geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION, motor_val.DRIVER_TO_MOTOR_steer,
          motor_val.DRIVER_TO_MOTOR_speed);
 }
 

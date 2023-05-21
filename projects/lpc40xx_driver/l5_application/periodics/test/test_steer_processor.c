@@ -103,19 +103,19 @@ void test_check_if_path_is_clear_of_obstacles() {
 
 void test_get_speed_level_based_on_obstacle_distance() {
   closest_obstacle_threshold_ahead = NO_OBSTACLE;
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_4, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_4, get_speed_level_based_on_obstacle_distance());
 
   closest_obstacle_threshold_ahead = OBSTACLE_THRESHOLD_LEVEL_3;
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_3, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_3, get_speed_level_based_on_obstacle_distance());
 
   closest_obstacle_threshold_ahead = OBSTACLE_THRESHOLD_LEVEL_2;
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_2, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_2, get_speed_level_based_on_obstacle_distance());
 
   closest_obstacle_threshold_ahead = OBSTACLE_THRESHOLD_LEVEL_1;
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_1, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_1, get_speed_level_based_on_obstacle_distance());
 
   closest_obstacle_threshold_ahead = OBSTACLE_THRESHOLD_LEVEL_0;
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_1, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_1 * 0.5, get_speed_level_based_on_obstacle_distance());
 
   dbc_ULTRASONIC_TO_DRIVER_s sensor_val;
   ignore_obstacle_leds();
@@ -123,19 +123,19 @@ void test_get_speed_level_based_on_obstacle_distance() {
   sensor_val.ULTRASONIC_TO_DRIVER_left = 30;
   sensor_val.ULTRASONIC_TO_DRIVER_right = 30;
   check_if_path_is_clear_of_obstacles(sensor_val);
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_1, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_1 * 0.5, get_speed_level_based_on_obstacle_distance());
 
   sensor_val.ULTRASONIC_TO_DRIVER_front = 30;
   sensor_val.ULTRASONIC_TO_DRIVER_left = 100;
   sensor_val.ULTRASONIC_TO_DRIVER_right = 200;
   check_if_path_is_clear_of_obstacles(sensor_val);
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_1, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_1 * 0.5, get_speed_level_based_on_obstacle_distance());
 
   sensor_val.ULTRASONIC_TO_DRIVER_front = 80;
   sensor_val.ULTRASONIC_TO_DRIVER_left = 100;
   sensor_val.ULTRASONIC_TO_DRIVER_right = 200;
   check_if_path_is_clear_of_obstacles(sensor_val);
-  TEST_ASSERT_EQUAL(THROTTLE_LEVEL_2, get_speed_level_based_on_obstacle_distance());
+  TEST_ASSERT_EQUAL(SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_2, get_speed_level_based_on_obstacle_distance());
 }
 
 void test_is_front_completely_blocked() {

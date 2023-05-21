@@ -26,14 +26,14 @@ void periodic_callbacks__initialize(void) {
   motor__init();
 }
 
-void periodic_callbacks__1Hz(uint32_t callback_count) {
-  // gpio__toggle(board_io__get_led0());
-  motor_controller__print_motor_cmd_values();
-}
+void periodic_callbacks__1Hz(uint32_t callback_count) { motor_controller__print_motor_cmd_values(); }
 
 void periodic_callbacks__10Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led1());
+  motor_controller__run_motor();
+  rpm_sensor__update_speed_value();
 }
+
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   // gpio__toggle(board_io__get_led2());
   motor_controller__read_all_can_messages();
@@ -46,6 +46,6 @@ void periodic_callbacks__100Hz(uint32_t callback_count) {
  * This may be disabled based on intialization of periodic_scheduler__initialize()
  */
 void periodic_callbacks__1000Hz(uint32_t callback_count) {
-  gpio__toggle(board_io__get_led3());
+  // gpio__toggle(board_io__get_led3());
   // Add your code here
 }

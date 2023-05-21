@@ -1,5 +1,4 @@
-#include "RPM.h"
-
+#include "rpm.h"
 #include <stddef.h>
 #include <stdio.h>
 
@@ -9,13 +8,12 @@
 #include "lpc_peripherals.h"
 #include "project.h"
 
-static const uint32_t timer_counter_upper_bound = 10000;
+extern bool is_car_in_reverse;
 
-static const float circumference_of_wheel_cm = 34.56f;
-static const float wheel_to_gear_ratio = 2.125f;
-static float kph_scalar = (circumference_of_wheel_cm * 3600) / (wheel_to_gear_ratio * 100000);
-static float speed_in_kph;
-static float speed_in_mph;
+static const double circumference_of_wheel_cm = 34.56;
+static const double wheel_to_gear_ratio = 2.125;
+static double kph_scalar = (circumference_of_wheel_cm * 3600) / (wheel_to_gear_ratio * 100000);
+static double speed_in_kph;
 
 static void timer2_isr(void) {
   LPC_TIM2->TC = 0;
@@ -34,17 +32,20 @@ void rpm_sensor__init(void) {
   kph_scalar *= clock__get_peripheral_clock_hz() / (prescalar_divider + 1);
 }
 
-void rpm_sensor__update_speed_value(dbc_MOTOR_TO_APP_DBG_s *speed_val) {
+void rpm_sensor__update_speed_value() {
   uint32_t timer_capture_value = LPC_TIM2->CR0;
-  uint32_t timer_counter_value = LPC_TIM2->TC;
-  float offset = 44500.0f;
-  speed_in_kph = (kph_scalar - offset) / timer_capture_value;
-  if (timer_counter_value > timer_counter_upper_bound || timer_capture_value == 0) {
-    speed_in_kph = 0.0f;
+  if (timer_capture_value == 0) {
+    timer_capture_value = 1;
   }
-  speed_in_mph = speed_in_kph * 0.6214;
-  speed_val->MOTOR_TO_APP_DBG_current_speed = speed_in_mph;
-  // printf("speed_in_kph %f kph_scalar=%f timer_capture_value=%d \n ", speed_in_kph, kph_scalar, timer_capture_value);
+  double const offset = 25000;
+
+  speed_in_kph = (kph_scalar - offset) / timer_capture_value;
+  if ((speed_in_kph < 0.5) || (speed_in_kph > 100)) {
+    speed_in_kph = 0.0;
+  }
+  if (is_car_in_reverse) {
+    speed_in_kph = -1 * speed_in_kph;
+  }
 }
 
-float rpm_sensor__get_current_speed() { return speed_in_mph; }
+double rpm_sensor__get_current_speed() { return speed_in_kph; }

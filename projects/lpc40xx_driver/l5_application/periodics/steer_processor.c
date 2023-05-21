@@ -6,7 +6,8 @@
 
 #define CAR_STOP_DISTANCE_THRESHOLD 10 // unit meters
 
-static int REVERSE_SPEED = -1 * THROTTLE_LEVEL_3;
+static const double SPEED_MULTIPLIER_FACTOR = 0.9;
+static const double REVERSE_SPEED = -1 * SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_3;
 
 static gpio_s FRONT_OBSTACLE_LED;
 static gpio_s LEFT_OBSTACLE_LED;
@@ -77,16 +78,17 @@ static bool back_path_is_clear(uint16_t back_sensor_cm) {
 }
 
 static bool check_if_path_is_clear_of_obstacles(dbc_ULTRASONIC_TO_DRIVER_s sensor_val) {
-  bool path_clear_status = true;
+  bool f = false, r = false, l = false, path_clear_status = false;
 
   uint16_t front_sensor_cm = sensor_val.ULTRASONIC_TO_DRIVER_front;
   uint16_t left_sensor_cm = sensor_val.ULTRASONIC_TO_DRIVER_left;
   uint16_t right_sensor_cm = sensor_val.ULTRASONIC_TO_DRIVER_right;
   uint16_t back_sensor_cm = sensor_val.ULTRASONIC_TO_DRIVER_back;
 
-  path_clear_status &= front_path_is_clear(front_sensor_cm);
-  path_clear_status &= right_path_is_clear(right_sensor_cm);
-  path_clear_status &= left_path_is_clear(left_sensor_cm);
+  f = front_path_is_clear(front_sensor_cm);
+  r = right_path_is_clear(right_sensor_cm);
+  l = left_path_is_clear(left_sensor_cm);
+  path_clear_status = f & r & l;
   back_path_is_clear(back_sensor_cm); // just to update current_obstacle_status
 
   closest_obstacle_threshold_ahead =
@@ -106,29 +108,29 @@ static bool is_front_completely_blocked() {
 }
 
 // Function to determine the speed level based on the obstacle threshold
-static int get_speed_level_based_on_obstacle_distance(void) {
-  speed_throttle_level_t speed_level;
+static double get_speed_level_based_on_obstacle_distance(void) {
+  double speed = 0;
   switch (closest_obstacle_threshold_ahead) {
   case OBSTACLE_THRESHOLD_LEVEL_0:
-    speed_level = THROTTLE_LEVEL_1;
+    speed = THROTTLE_LEVEL_1 * 0.5; // not completely blocked but very close to obstacle on some sides
     break;
   case OBSTACLE_THRESHOLD_LEVEL_1:
-    speed_level = THROTTLE_LEVEL_1;
+    speed = THROTTLE_LEVEL_1;
     break;
   case OBSTACLE_THRESHOLD_LEVEL_2:
-    speed_level = THROTTLE_LEVEL_2;
+    speed = THROTTLE_LEVEL_2;
     break;
   case OBSTACLE_THRESHOLD_LEVEL_3:
-    speed_level = THROTTLE_LEVEL_3;
+    speed = THROTTLE_LEVEL_3;
     break;
   case NO_OBSTACLE:
-    speed_level = THROTTLE_LEVEL_4;
+    speed = THROTTLE_LEVEL_4;
     break;
   default:
-    speed_level = THROTTLE_LEVEL_0;
+    speed = THROTTLE_LEVEL_0;
     break;
   }
-  return (int)speed_level;
+  return SPEED_MULTIPLIER_FACTOR * speed;
 }
 
 // Function to determine the steer angle based on the direction of the obstacles
@@ -181,20 +183,20 @@ static int get_steer_angle_based_on_obstacle_closeness() {
 static void avoid_obstacles(dbc_DRIVER_TO_MOTOR_s *motor_val) {
   if (is_front_completely_blocked()) {
     if (current_obstacle_status.back_status > OBSTACLE_THRESHOLD_LEVEL_2) {
-      motor_val->DRIVER_TO_MOTOR_speed = REVERSE_SPEED;
+      motor_val->DRIVER_TO_MOTOR_speed = (int)(1000 * REVERSE_SPEED);
       motor_val->DRIVER_TO_MOTOR_steer = STEER_MEDIUM_RIGHT;
     } else {
-      motor_val->DRIVER_TO_MOTOR_speed = THROTTLE_LEVEL_0;
-      motor_val->DRIVER_TO_MOTOR_steer = STEER_STRAIGHT;
+      motor_val->DRIVER_TO_MOTOR_speed = -1 * THROTTLE_LEVEL_1 * 0.5;
+      motor_val->DRIVER_TO_MOTOR_steer = STEER_MEDIUM_RIGHT;
     }
   } else {
-    motor_val->DRIVER_TO_MOTOR_speed = get_speed_level_based_on_obstacle_distance();
+    motor_val->DRIVER_TO_MOTOR_speed = (int)(1000 * get_speed_level_based_on_obstacle_distance());
     motor_val->DRIVER_TO_MOTOR_steer = get_steer_angle_based_on_obstacle_closeness();
   }
 }
 
 // Function to determine the speed level based on the distance to the destination
-int get_speed_level_based_on_distance_to_destination(int destination_distance_meters) {
+static double get_speed_level_based_on_distance_to_destination(int destination_distance_meters) {
   speed_throttle_level_t speed_level = THROTTLE_LEVEL_0;
   if (destination_distance_meters > 100) {
     speed_level = THROTTLE_LEVEL_4;
@@ -203,7 +205,7 @@ int get_speed_level_based_on_distance_to_destination(int destination_distance_me
   } else if (destination_distance_meters <= CAR_STOP_DISTANCE_THRESHOLD) {
     speed_level = THROTTLE_LEVEL_0;
   }
-  return (int)speed_level;
+  return SPEED_MULTIPLIER_FACTOR * speed_level;
 }
 
 // Function to determine the steer angle based on the direction of the destination
@@ -249,7 +251,7 @@ static void drive_towards_destination(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_GEO_
 
   // TODO: this is only for obstacle detection testing. delete this when the mobile app is ready
   motor_val->DRIVER_TO_MOTOR_steer = STEER_STRAIGHT;
-  motor_val->DRIVER_TO_MOTOR_speed = THROTTLE_LEVEL_4;
+  motor_val->DRIVER_TO_MOTOR_speed = (int)(1000 * SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_4);
 }
 
 // Function to check and avoid obstacles and go towards destination

@@ -49,7 +49,7 @@ void LCD_display_1Hz(void) {
 
   send_LCD_command(0xCA);
 
-  sprintf(lcd_buffer, "Speed: %d", lcd_motor.DRIVER_TO_MOTOR_speed);
+  sprintf(lcd_buffer, "Speed: %d", lcd_motor.DRIVER_TO_MOTOR_speed / 1000);
   send_LCD_string(lcd_buffer);
 
   send_LCD_command(0x9F);

@@ -62,11 +62,11 @@ static void compass__transformation_mag(float uncalibrated_values[3]) {
   mag[2] = calibrated_mag_values[2];
 }
 
-static void compass__calculate_current_heading(float mag[3]) {
-  float magnitude = sqrtf(mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2]);
-  float Mxz = mag[2] / magnitude;
-  float Mxy = mag[1] / magnitude;
-  float Mxx = mag[0] / magnitude;
+static void compass__calculate_current_bearing(float mag_arr[3]) {
+  float magnitude = sqrtf(mag_arr[0] * mag_arr[0] + mag_arr[1] * mag_arr[1] + mag_arr[2] * mag_arr[2]);
+  float Mxz = mag_arr[2] / magnitude;
+  float Mxy = mag_arr[1] / magnitude;
+  float Mxx = mag_arr[0] / magnitude;
   // printf("Without magnitude angle: %f\n", (atan2(mag[1], mag[0])) * 180 / 3.1415926535);
   current_compass_bearing = (atan2(Mxy, Mxx)) * 180 / PI;
   if (current_compass_bearing < 0) {
@@ -84,7 +84,7 @@ static void compass__read() {
 
     compass__transformation_mag(mag);
     // printf("x %f, y %f, z %f\n", mag[0], mag[1], mag[2]);
-    compass__calculate_current_heading(mag);
+    compass__calculate_current_bearing(mag);
   }
 }
 

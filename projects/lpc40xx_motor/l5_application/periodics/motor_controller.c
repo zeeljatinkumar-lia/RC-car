@@ -10,7 +10,7 @@
 
 static gpio_s MIA_LED;
 
-const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {.DRIVER_TO_MOTOR_speed = 9,
+const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR = {.DRIVER_TO_MOTOR_speed = 0,
                                                                    .DRIVER_TO_MOTOR_steer = 0};
 
 const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 1500;
@@ -25,8 +25,8 @@ static void motor_controller__manage_mia() {
   }
 }
 
-static void motor_controller__run_motor() {
-  motor__run_dc_motor_by_speed(motor_val.DRIVER_TO_MOTOR_speed);
+void motor_controller__run_motor() {
+  motor__run_dc_motor_by_speed((double)motor_val.DRIVER_TO_MOTOR_speed / 1000.0);
   motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);
 }
 
@@ -48,21 +48,19 @@ void fake_motor_values() {
 }*/
 
 void motor_controller__print_motor_cmd_values() {
-  printf("speed=%d,steer=%d\n", motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_steer);
+  printf("speed=%ld,steer=%d,curr_speed=%ld\n", motor_val.DRIVER_TO_MOTOR_speed, motor_val.DRIVER_TO_MOTOR_steer,
+         speed_val.MOTOR_TO_APP_DBG_current_speed);
 }
 
 void motor_controller__read_all_can_messages() {
   can__msg_t msg = {0};
   dbc_message_header_t header = {0};
   // fake_motor_values();
-  // motor_controller__run_motor();
-  rpm_sensor__update_speed_value(&speed_val);
   while (can__rx(can1, &msg, 0)) {
     gpio__reset(MIA_LED); // turn OFF since we received the CAN message
     header.message_dlc = msg.frame_fields.data_len;
     header.message_id = msg.msg_id;
     dbc_decode_DRIVER_TO_MOTOR(&motor_val, header, msg.data.bytes);
-    motor_controller__run_motor();
   }
   motor_controller__manage_mia();
 }
@@ -70,8 +68,7 @@ void motor_controller__read_all_can_messages() {
 static void motor_controller__encode_speed_message(can__msg_t *msg) {
   dbc_message_header_t header = {0};
 
-  // TODO: remove this once we start getting actual speed from RPM sensor
-  speed_val.MOTOR_TO_APP_DBG_current_speed = motor_val.DRIVER_TO_MOTOR_speed;
+  speed_val.MOTOR_TO_APP_DBG_current_speed = (int)(1000.0 * rpm_sensor__get_current_speed());
   speed_val.MOTOR_TO_APP_DBG_current_steer = motor_val.DRIVER_TO_MOTOR_steer;
 
   header = dbc_encode_MOTOR_TO_APP_DBG(msg->data.bytes, &speed_val);
