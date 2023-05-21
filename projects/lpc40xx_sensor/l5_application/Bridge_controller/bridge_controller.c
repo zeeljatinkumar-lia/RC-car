@@ -23,7 +23,7 @@ static dbc_GPS_DESTINATION_s gps_destination_location;
 static dbc_GPS_DESTINATION_s gps_destination_location_last_sent;
 static dbc_GEO_STATUS_s compass_value_to_app;
 static dbc_GEO_CURRENT_COORDS_s geo_coordinates_to_app;
-static dbc_DRIVER_TO_MOTOR_s steer_speed_to_app;
+static dbc_MOTOR_TO_APP_DBG_s motor_speed_to_app;
 dbc_DRIVE_STATUS_CMD_s bridge_app_commands;
 
 static char line_buffer[100];
@@ -36,8 +36,8 @@ const uint32_t dbc_mia_threshold_GEO_STATUS = 1500;
 const dbc_GEO_STATUS_s dbc_mia_replacement_GEO_STATUS;
 const uint32_t dbc_mia_threshold_GEO_CURRENT_COORDS = 1500;
 const dbc_GEO_CURRENT_COORDS_s dbc_mia_replacement_GEO_CURRENT_COORDS;
-const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 1500;
-const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR;
+const uint32_t dbc_mia_threshold_MOTOR_TO_APP_DBG = 1500;
+const dbc_MOTOR_TO_APP_DBG_s dbc_mia_replacement_MOTOR_TO_APP_DBG;
 
 /* STATIC FUNCTION*/
 static void Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void);
@@ -154,12 +154,12 @@ void bridge_controller_transmit_value_to_app(void) {
   char sensor_msg[100] = {0};
   dbc_ULTRASONIC_TO_DRIVER_s sensor_values = get_ultra_sonic_data();
   int dummy_value = 0;
-  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
+  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%f,%f,%d,%f,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
            sensor_values.ULTRASONIC_TO_DRIVER_front, sensor_values.ULTRASONIC_TO_DRIVER_right,
-           sensor_values.ULTRASONIC_TO_DRIVER_back, geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000,
-           geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000, compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
-           steer_speed_to_app.DRIVER_TO_MOTOR_speed, steer_speed_to_app.DRIVER_TO_MOTOR_steer,
-           compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
+           sensor_values.ULTRASONIC_TO_DRIVER_back, (double)geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000,
+           (double)geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000, compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
+           (double)motor_speed_to_app.MOTOR_TO_APP_DBG_current_speed / 1000,
+           motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer, compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
 
   uart_printf(bridge_uart, "%s", sensor_msg);
 }
@@ -217,7 +217,7 @@ bool bridge_controller__decode_motor_msg(can__msg_t *msg) {
       .message_id = msg->msg_id,
       .message_dlc = msg->frame_fields.data_len,
   };
-  if (dbc_decode_DRIVER_TO_MOTOR(&steer_speed_to_app, header, msg->data.bytes)) {
+  if (dbc_decode_MOTOR_TO_APP_DBG(&motor_speed_to_app, header, msg->data.bytes)) {
     status = true;
   } else {
     status = false;
@@ -233,7 +233,7 @@ void bridge_can_mia_handler(void) {
   if (dbc_service_mia_GEO_CURRENT_COORDS(&geo_coordinates_to_app, mia_increment_value)) {
     gpio__set(MIA_LED); // turn ON to indicate MIA
   }
-  if (dbc_service_mia_DRIVER_TO_MOTOR(&steer_speed_to_app, mia_increment_value)) {
+  if (dbc_service_mia_MOTOR_TO_APP_DBG(&motor_speed_to_app, mia_increment_value)) {
     gpio__set(MIA_LED); // turn ON to indicate MIA
   }
 }
