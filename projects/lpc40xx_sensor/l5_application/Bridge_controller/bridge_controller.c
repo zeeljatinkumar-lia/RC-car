@@ -127,8 +127,8 @@ void can_bridge_controller__Sending_dest_location(void) {
 }
 
 void bridge_controller_handler__parse_gps_data(void) {
-  static char temp_line_buffer[] = "GPS17291291,-32724082#";
-  sscanf(temp_line_buffer, "GPS%ld,%ld#", &gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
+  // static char temp_line_buffer[] = "GPS17291291,-32724082#";
+  sscanf(line_buffer, "%ld,%ld", &gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
          &gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
 
   if (gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000 != 0 &&
@@ -239,21 +239,17 @@ void bridge_can_mia_handler(void) {
 }
 
 void app_to_bridge_command(void) {
+  printf("%s \n", line_buffer);
+  sscanf(line_buffer, "%s", &app_command);
 
-  const int BRIDGE_APP_DEFAULT_DATA = 0;
-  const int BRIDGE_APP_STOP_DATA = 3;
-  const int BRIDGE_APP_START_DATA = 1;
-  // printf("%s \n", line_buffer);
-  sscanf(line_buffer, "a%s", &app_command);
+  if (strncmp(app_command, "Start", strlen("Start")) == 0) {
+    bridge_app_commands.DRIVE_STATUS_CMD_start = 1;
 
-  if ((strcmp(app_command, "Start"))) {
-    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_STOP_DATA;
-
-  } else if (strcmp(app_command, "Stop")) {
+  } else if (strncmp(app_command, "Stop", strlen("Stop")) == 0) {
     gps_dest_data_latched = false;
-    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_START_DATA;
+    bridge_app_commands.DRIVE_STATUS_CMD_start = 0;
   } else {
-    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_DEFAULT_DATA;
+    bridge_app_commands.DRIVE_STATUS_CMD_start = 0;
   }
 }
 

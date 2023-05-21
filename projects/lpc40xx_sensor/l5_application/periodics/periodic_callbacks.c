@@ -35,7 +35,6 @@ void periodic_callbacks__1Hz(uint32_t callback_count) {
 
 void periodic_callbacks__10Hz(uint32_t callback_count) { Bridge_Controller__10hz_handler(); }
 
-
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   CAN_RX_MSGS_FOR_BRIDGE();
   Sensor_Controller__100hz_handler(callback_count);
