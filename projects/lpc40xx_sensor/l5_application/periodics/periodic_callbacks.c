@@ -29,20 +29,20 @@ void periodic_callbacks__initialize(void) {
 void periodic_callbacks__1Hz(uint32_t callback_count) {
   bridge_can_mia_handler();
   Sensor_Controller__print_sensor_values();
+  bridge_controller_transmit_value_to_app();
   can_ultrasonic_reset();
 }
 
-void periodic_callbacks__10Hz(uint32_t callback_count) {
+void periodic_callbacks__10Hz(uint32_t callback_count) { Bridge_Controller__10hz_handler(); }
 
-  Bridge_Controller__10hz_handler();
-  can_bridge_controller__Sending_dest_location();
-  bridge_controller_transmit_value_to_app();
-}
 
 void periodic_callbacks__100Hz(uint32_t callback_count) {
   CAN_RX_MSGS_FOR_BRIDGE();
   Sensor_Controller__100hz_handler(callback_count);
   can_ultrasonic_sensor_transmit_messages();
+  can_bridge_controller__Sending_dest_location();
+
+  send_app_command_on_can();
 }
 
 /**

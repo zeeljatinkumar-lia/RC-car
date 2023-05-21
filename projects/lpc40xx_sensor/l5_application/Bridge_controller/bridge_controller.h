@@ -14,3 +14,5 @@ void bridge_controller_transmit_value_to_app(void);
 
 void CAN_RX_MSGS_FOR_BRIDGE(void);
 void bridge_can_mia_handler(void);
+
+void send_app_command_on_can(void);

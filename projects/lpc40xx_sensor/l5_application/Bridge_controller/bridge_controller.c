@@ -22,21 +22,33 @@ static gpio_s MIA_LED;
 static dbc_GPS_DESTINATION_s gps_destination_location;
 static dbc_GPS_DESTINATION_s gps_destination_location_last_sent;
 static dbc_GEO_STATUS_s compass_value_to_app;
+static dbc_GEO_CURRENT_COORDS_s geo_coordinates_to_app;
+static dbc_DRIVER_TO_MOTOR_s steer_speed_to_app;
+dbc_DRIVE_STATUS_CMD_s bridge_app_commands;
 
 static char line_buffer[100];
 static line_buffer_s line;
 static bool gps_dest_data_latched = false;
 static uart_e bridge_uart = UART__3;
+static char app_command[10] = {0};
 
 const uint32_t dbc_mia_threshold_GEO_STATUS = 1500;
 const dbc_GEO_STATUS_s dbc_mia_replacement_GEO_STATUS;
+const uint32_t dbc_mia_threshold_GEO_CURRENT_COORDS = 1500;
+const dbc_GEO_CURRENT_COORDS_s dbc_mia_replacement_GEO_CURRENT_COORDS;
+const uint32_t dbc_mia_threshold_DRIVER_TO_MOTOR = 1500;
+const dbc_DRIVER_TO_MOTOR_s dbc_mia_replacement_DRIVER_TO_MOTOR;
 
 /* STATIC FUNCTION*/
 static void Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void);
 static void Bridge_Controller__get_line_from_buffer(void);
-static void bridge_controller__decode_geo_message(can__msg_t *msg);
+static bool bridge_controller__decode_geo_message(can__msg_t *msg);
+static bool bridge_controller__decode_geo_coordinates(can__msg_t *msg);
+static bool bridge_controller__decode_motor_msg(can__msg_t *msg);
 
 void bridge_controller_handler__parse_gps_data(void);
+
+void app_to_bridge_command(void);
 
 void Bridge_Controller_init(void) {
   MIA_LED = gpio__construct_as_output(GPIO__PORT_0, 17);
@@ -61,6 +73,10 @@ void Bridge_Controller__10hz_handler(void) {
   Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer();
   Bridge_Controller__get_line_from_buffer();
   bridge_controller_handler__parse_gps_data();
+
+  Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer();
+  Bridge_Controller__get_line_from_buffer();
+  app_to_bridge_command();
 }
 
 void Bridge_Controller__transfer_data_from_uart_driver_to_line_buffer(void) {
@@ -137,32 +153,76 @@ void bridge_controller_handler__parse_gps_data(void) {
 void bridge_controller_transmit_value_to_app(void) {
   char sensor_msg[100] = {0};
   dbc_ULTRASONIC_TO_DRIVER_s sensor_values = get_ultra_sonic_data();
-
-  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
+  int dummy_value = 0;
+  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
            sensor_values.ULTRASONIC_TO_DRIVER_front, sensor_values.ULTRASONIC_TO_DRIVER_right,
-           sensor_values.ULTRASONIC_TO_DRIVER_back, compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
-           compass_value_to_app.GEO_STATUS_COMPASS_HEADING);
+           sensor_values.ULTRASONIC_TO_DRIVER_back, geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000,
+           geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000, compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
+           steer_speed_to_app.DRIVER_TO_MOTOR_speed, steer_speed_to_app.DRIVER_TO_MOTOR_steer,
+           compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
 
   uart_printf(bridge_uart, "%s", sensor_msg);
 }
 
 void CAN_RX_MSGS_FOR_BRIDGE(void) {
   can__msg_t can_msg = {0};
+  bool geo_msg_received, geo_cordinates_received, motor_msg_recieved = 0;
   while (can__rx(can1, &can_msg, 0)) {
-    bridge_controller__decode_geo_message(&can_msg);
-    gpio__reset(MIA_LED); // turn OFF since we received the CAN message
+    geo_msg_received = bridge_controller__decode_geo_message(&can_msg);
+
+    // TODO:zeel receive current geo coord from Geo_current_cord and divide them by 100000 before sending it to app
+    geo_cordinates_received = bridge_controller__decode_geo_coordinates(&can_msg);
+    // TODO:zeel recieve speed and steer from MOTOR_TO_APP
+    motor_msg_recieved = bridge_controller__decode_motor_msg(&can_msg); // speed and steer
+
+    if (geo_msg_received && geo_cordinates_received && motor_msg_recieved) {
+      gpio__reset(MIA_LED); // turn OFF since we received the CAN message
+    }
   }
 }
 
-void bridge_controller__decode_geo_message(can__msg_t *msg) {
+bool bridge_controller__decode_geo_message(can__msg_t *msg) {
+  bool status;
   const dbc_message_header_t header = {
       .message_id = msg->msg_id,
       .message_dlc = msg->frame_fields.data_len,
   };
 
   if (dbc_decode_GEO_STATUS(&compass_value_to_app, header, msg->data.bytes)) {
-    bridge_controller_transmit_value_to_app();
+    status = true;
+  } else {
+    status = false;
   }
+  return status;
+}
+bool bridge_controller__decode_geo_coordinates(can__msg_t *msg) {
+  bool status;
+  const dbc_message_header_t header = {
+      .message_id = msg->msg_id,
+      .message_dlc = msg->frame_fields.data_len,
+  };
+  if (dbc_decode_GEO_CURRENT_COORDS(&geo_coordinates_to_app, header, msg->data.bytes)) {
+    geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 = geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 / 100000;
+    geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 = geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 / 100000;
+    status = true;
+  } else {
+    status = false;
+  }
+  return status;
+}
+
+bool bridge_controller__decode_motor_msg(can__msg_t *msg) {
+  bool status;
+  const dbc_message_header_t header = {
+      .message_id = msg->msg_id,
+      .message_dlc = msg->frame_fields.data_len,
+  };
+  if (dbc_decode_DRIVER_TO_MOTOR(&steer_speed_to_app, header, msg->data.bytes)) {
+    status = true;
+  } else {
+    status = false;
+  }
+  return status;
 }
 
 void bridge_can_mia_handler(void) {
@@ -170,4 +230,43 @@ void bridge_can_mia_handler(void) {
   if (dbc_service_mia_GEO_STATUS(&compass_value_to_app, mia_increment_value)) {
     gpio__set(MIA_LED); // turn ON to indicate MIA
   }
+  if (dbc_service_mia_GEO_CURRENT_COORDS(&geo_coordinates_to_app, mia_increment_value)) {
+    gpio__set(MIA_LED); // turn ON to indicate MIA
+  }
+  if (dbc_service_mia_DRIVER_TO_MOTOR(&steer_speed_to_app, mia_increment_value)) {
+    gpio__set(MIA_LED); // turn ON to indicate MIA
+  }
+}
+
+void app_to_bridge_command(void) {
+
+  const int BRIDGE_APP_DEFAULT_DATA = 0;
+  const int BRIDGE_APP_STOP_DATA = 3;
+  const int BRIDGE_APP_START_DATA = 1;
+  // printf("%s \n", line_buffer);
+  sscanf(line_buffer, "a%s", &app_command);
+
+  if ((strcmp(app_command, "Start"))) {
+    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_STOP_DATA;
+
+  } else if (strcmp(app_command, "Stop")) {
+    gps_dest_data_latched = false;
+    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_START_DATA;
+  } else {
+    bridge_app_commands.DRIVE_STATUS_CMD_start = BRIDGE_APP_DEFAULT_DATA;
+  }
+}
+
+void send_app_command_on_can(void) {
+  can__msg_t can_msg = {0};
+  dbc_message_header_t header = {
+      .message_id = 0x0,
+      .message_dlc = 0,
+  };
+
+  header = dbc_encode_DRIVE_STATUS_CMD(can_msg.data.bytes, &bridge_app_commands);
+
+  can_msg.msg_id = header.message_id;
+  can_msg.frame_fields.data_len = header.message_dlc;
+  can__tx(can1, &can_msg, 0);
 }

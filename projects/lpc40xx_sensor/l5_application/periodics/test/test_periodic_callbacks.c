@@ -45,13 +45,13 @@ void test__periodic_callbacks__1Hz(void) {
   bridge_can_mia_handler_Expect();
   can_ultrasonic_reset_ExpectAndReturn(true);
   Sensor_Controller__print_sensor_values_Expect();
+  bridge_controller_transmit_value_to_app_Expect();
   periodic_callbacks__1Hz(0);
 }
 
 void test__periodic_callbacks__10Hz(void) {
   Bridge_Controller__10hz_handler_Expect();
-  can_bridge_controller__Sending_dest_location_Expect();
-  bridge_controller_transmit_value_to_app_Expect();
+
   periodic_callbacks__10Hz(0);
 }
 
@@ -59,5 +59,7 @@ void test__periodic_callbacks__100Hz(void) {
   CAN_RX_MSGS_FOR_BRIDGE_Expect();
   Sensor_Controller__100hz_handler_ExpectAnyArgs();
   can_ultrasonic_sensor_transmit_messages_Expect();
+  can_bridge_controller__Sending_dest_location_Expect();
+  send_app_command_on_can_Expect();
   periodic_callbacks__100Hz(0);
 }
