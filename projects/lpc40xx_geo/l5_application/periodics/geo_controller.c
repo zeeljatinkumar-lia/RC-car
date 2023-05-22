@@ -64,11 +64,16 @@ void geo_controller__calculate_heading() {
 
   geo_status.GEO_STATUS_COMPASS_BEARING = compass__get_current_bearing();
 
-  geo_status.GEO_STATUS_COMPASS_HEADING =
-      (uint16_t)waypoints__calculate_heading_to_next_point(current_coord, scaled_dest_coord);
-  geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION =
-      waypoints__calculate_distance_to_dest(current_coord, scaled_dest_coord);
   geo_status.GEO_STATUS_SATELLITE_LOCKED = gps__get_satellite_lock_status();
+  if (geo_status.GEO_STATUS_SATELLITE_LOCKED == 1) {
+    geo_status.GEO_STATUS_COMPASS_HEADING =
+        (uint16_t)waypoints__calculate_heading_to_next_point(current_coord, scaled_dest_coord);
+    geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION =
+        (float)waypoints__calculate_distance_to_dest(current_coord, scaled_dest_coord);
+  } else {
+    geo_status.GEO_STATUS_COMPASS_HEADING = 0;
+    geo_status.GEO_STATUS_DISTANCE_TO_DESTINATION = 0;
+  }
 }
 
 static void geo_controller__encode_driver_message(can__msg_t *msg) {

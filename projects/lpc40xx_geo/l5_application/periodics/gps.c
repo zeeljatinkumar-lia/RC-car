@@ -49,6 +49,20 @@ static void gps__transfer_data_from_uart_driver_to_line_buffer(void) {
   }
 }
 
+static void gps__convert_string_to_latitude(float latitude) {
+  int dd = (int)latitude / 100;
+  float mm = fmod(latitude, 100);
+  parsed_coordinates.latitude = (float)dd + (mm / 60);
+  // printf("lat = %f\n", parsed_coordinates.latitude);
+}
+
+static void gps__convert_string_to_longitude(float longitude) {
+  int ddd = (int)longitude / 100;
+  float mm = fmod(longitude, 100);
+  parsed_coordinates.longitude = (float)ddd + (mm / 60);
+  // printf("lat = %f\n", parsed_coordinates.longitude);
+}
+
 /* The format of the GPS coordinates string of type "Global Positioning System Fix Data" is as follows:
 "$GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh\r\n"
 Each word is separated by a comma and has a special meaning. Of these we are currently interested only in:
@@ -100,8 +114,8 @@ static void gps__coordinate_parser(char *str) {
         break;
       }
     }
-    parsed_coordinates.latitude = latitude / 100;
-    parsed_coordinates.longitude = longitude / 100;
+    gps__convert_string_to_latitude(latitude);
+    gps__convert_string_to_longitude(longitude);
     // printf("lat %f, long %f\n", parsed_coordinates.latitude, parsed_coordinates.longitude);
   }
 }

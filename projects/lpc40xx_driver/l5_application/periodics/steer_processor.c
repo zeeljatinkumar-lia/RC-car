@@ -246,12 +246,12 @@ static void drive_towards_destination(dbc_DRIVER_TO_MOTOR_s *motor_val, dbc_GEO_
   int dist_to_dest = geo_heading.GEO_STATUS_DISTANCE_TO_DESTINATION;
 
   // TODO: uncomment this actual logic when the mobile app is ready
-  // motor_val->DRIVER_TO_MOTOR_steer = get_steer_angle_based_on_destination_direction(dest_angle, curr_angle);
-  // motor_val->DRIVER_TO_MOTOR_speed = get_speed_level_based_on_distance_to_destination(dist_to_dest);
+  motor_val->DRIVER_TO_MOTOR_steer = get_steer_angle_based_on_destination_direction(dest_angle, curr_angle);
+  motor_val->DRIVER_TO_MOTOR_speed = get_speed_level_based_on_distance_to_destination(dist_to_dest);
 
   // TODO: this is only for obstacle detection testing. delete this when the mobile app is ready
-  motor_val->DRIVER_TO_MOTOR_steer = STEER_STRAIGHT;
-  motor_val->DRIVER_TO_MOTOR_speed = (int)(1000 * SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_4);
+  // motor_val->DRIVER_TO_MOTOR_steer = STEER_STRAIGHT;
+  // motor_val->DRIVER_TO_MOTOR_speed = (int)(1000 * SPEED_MULTIPLIER_FACTOR * THROTTLE_LEVEL_4);
 }
 
 // Function to check and avoid obstacles and go towards destination

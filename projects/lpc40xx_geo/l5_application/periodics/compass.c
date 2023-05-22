@@ -72,6 +72,7 @@ static void compass__calculate_current_bearing(float mag_arr[3]) {
   if (current_compass_bearing < 0) {
     current_compass_bearing = 360 + current_compass_bearing;
   }
+  current_compass_bearing = (360 - (int)current_compass_bearing) % 360;
   // printf("current_compass_bearing: %f\n", current_compass_bearing);
 }
 
