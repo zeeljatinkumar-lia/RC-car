@@ -26,6 +26,8 @@ static dbc_GEO_CURRENT_COORDS_s geo_coordinates_to_app;
 static dbc_MOTOR_TO_APP_DBG_s motor_speed_to_app;
 dbc_DRIVE_STATUS_CMD_s bridge_app_commands;
 
+double latitude_from_app, longitude_from_app;
+
 static char line_buffer[100];
 static line_buffer_s line;
 static bool gps_dest_data_latched = false;
@@ -104,11 +106,13 @@ void can_bridge_controller__Sending_dest_location(void) {
   dbc_GPS_DESTINATION_s BRIDGE_DEFAULT_DATA = {};
 
   if (gps_dest_data_latched) {
+    // printf("gps destination latched");
     BRIDGE_TO_GPS_DATA.GPS_DEST_LATITUDE_SCALED_100000 =
         gps_destination_location_last_sent.GPS_DEST_LATITUDE_SCALED_100000;
     BRIDGE_TO_GPS_DATA.GPS_DEST_LONGITUDE_SCALED_100000 =
         gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000;
-
+    // printf("Latitude is %ld and longitude is %ld \n", gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
+    // gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
     header = dbc_encode_GPS_DESTINATION(can_msg.data.bytes, &gps_destination_location_last_sent);
 
     can_msg.msg_id = header.message_id;
@@ -128,14 +132,15 @@ void can_bridge_controller__Sending_dest_location(void) {
 
 void bridge_controller_handler__parse_gps_data(void) {
   // static char temp_line_buffer[] = "GPS17291291,-32724082#";
-  sscanf(line_buffer, "%ld,%ld", &gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
-         &gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
+  printf("%s \n", line_buffer);
+  sscanf(line_buffer, "%lf ,%lf", &latitude_from_app, &longitude_from_app);
 
+  printf("Latitude is %f and longitude is %f \n", latitude_from_app, longitude_from_app);
+  gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000 = (int32_t)(latitude_from_app * 100000);
+  gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000 = (int32_t)(longitude_from_app * 100000);
   if (gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000 != 0 &&
       gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000 != 0 && !gps_dest_data_latched) {
 
-    printf("Latitude is %ld and longitude is %ld \n", gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
-           gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
     gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000 =
         gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000;
     gps_destination_location_last_sent.GPS_DEST_LATITUDE_SCALED_100000 =
@@ -154,12 +159,14 @@ void bridge_controller_transmit_value_to_app(void) {
   char sensor_msg[100] = {0};
   dbc_ULTRASONIC_TO_DRIVER_s sensor_values = get_ultra_sonic_data();
   int dummy_value = 0;
-  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%f,%f,%d,%f,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
+  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%lf,%lf,%d,%f,%d,%f", sensor_values.ULTRASONIC_TO_DRIVER_left,
            sensor_values.ULTRASONIC_TO_DRIVER_front, sensor_values.ULTRASONIC_TO_DRIVER_right,
-           sensor_values.ULTRASONIC_TO_DRIVER_back, (double)geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000,
-           (double)geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000, compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
+           sensor_values.ULTRASONIC_TO_DRIVER_back, (double)geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 / 100000,
+           (double)geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 / 100000,
+           compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
            (double)motor_speed_to_app.MOTOR_TO_APP_DBG_current_speed / 1000,
-           motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer, compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
+           motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer,
+           (double)compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
 
   uart_printf(bridge_uart, "%s", sensor_msg);
 }
@@ -202,8 +209,7 @@ bool bridge_controller__decode_geo_coordinates(can__msg_t *msg) {
       .message_dlc = msg->frame_fields.data_len,
   };
   if (dbc_decode_GEO_CURRENT_COORDS(&geo_coordinates_to_app, header, msg->data.bytes)) {
-    geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 = geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 / 100000;
-    geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 = geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 / 100000;
+
     status = true;
   } else {
     status = false;
@@ -239,7 +245,7 @@ void bridge_can_mia_handler(void) {
 }
 
 void app_to_bridge_command(void) {
-  printf("%s \n", line_buffer);
+
   sscanf(line_buffer, "%s", &app_command);
 
   if (strncmp(app_command, "Start", strlen("Start")) == 0) {
