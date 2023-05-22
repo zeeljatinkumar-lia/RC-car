@@ -159,14 +159,14 @@ void bridge_controller_transmit_value_to_app(void) {
   char sensor_msg[100] = {0};
   dbc_ULTRASONIC_TO_DRIVER_s sensor_values = get_ultra_sonic_data();
   int dummy_value = 0;
-  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%lf,%lf,%d,%f,%d,%f", sensor_values.ULTRASONIC_TO_DRIVER_left,
+  snprintf(sensor_msg, 100, "%d,%d,%d,%d,%lf,%lf,%d,%f,%d,%d", sensor_values.ULTRASONIC_TO_DRIVER_left,
            sensor_values.ULTRASONIC_TO_DRIVER_front, sensor_values.ULTRASONIC_TO_DRIVER_right,
            sensor_values.ULTRASONIC_TO_DRIVER_back, (double)geo_coordinates_to_app.CURR_LATITUDE_SCALED_100000 / 100000,
            (double)geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 / 100000,
            compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
            (double)motor_speed_to_app.MOTOR_TO_APP_DBG_current_speed / 1000,
            motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer,
-           (double)compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
+           compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
 
   uart_printf(bridge_uart, "%s", sensor_msg);
 }
