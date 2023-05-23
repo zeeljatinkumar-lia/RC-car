@@ -196,16 +196,14 @@ static void avoid_obstacles(dbc_DRIVER_TO_MOTOR_s *motor_val) {
 }
 
 // Function to determine the speed level based on the distance to the destination
-static double get_speed_level_based_on_distance_to_destination(int destination_distance_meters) {
+static int get_speed_level_based_on_distance_to_destination(int destination_distance_meters) {
   speed_throttle_level_t speed_level = THROTTLE_LEVEL_0;
-  if (destination_distance_meters > 100) {
-    speed_level = THROTTLE_LEVEL_4;
-  } else if (destination_distance_meters > 50) {
-    speed_level = THROTTLE_LEVEL_2;
-  } else if (destination_distance_meters <= CAR_STOP_DISTANCE_THRESHOLD) {
+  if (destination_distance_meters <= CAR_STOP_DISTANCE_THRESHOLD) {
     speed_level = THROTTLE_LEVEL_0;
+  } else {
+    speed_level = THROTTLE_LEVEL_4;
   }
-  return SPEED_MULTIPLIER_FACTOR * speed_level;
+  return (int)(1000 * SPEED_MULTIPLIER_FACTOR * speed_level);
 }
 
 // Function to determine the steer angle based on the direction of the destination
@@ -218,8 +216,16 @@ int get_steer_angle_based_on_destination_direction(int dest, int curr) {
   } else if (angle_difference < -180) {
     angle_difference += 360;
   }
-
+  
   if (angle_difference > 60) {
+    return STEER_SOFT_RIGHT;
+  } else if (angle_difference < -60) {
+    return STEER_SOFT_LEFT;
+  } else {
+    return STEER_STRAIGHT;
+  }
+
+  /*if (angle_difference > 60) {
     return STEER_SHARP_RIGHT;
   } else if (angle_difference > 45) {
     return STEER_MEDIUM_RIGHT;
@@ -233,7 +239,7 @@ int get_steer_angle_based_on_destination_direction(int dest, int curr) {
     return STEER_SOFT_LEFT;
   } else {
     return 0;
-  }
+  }*/
   return (int)steer;
 }
 

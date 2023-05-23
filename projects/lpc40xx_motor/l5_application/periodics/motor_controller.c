@@ -49,7 +49,6 @@ static void motor_controller__manage_mia() {
 }
 
 void motor_controller__run_motor() {
-  //printf("%d\n", car_on_off_command.DRIVE_STATUS_CMD_start);
   if (car_on_off_command.DRIVE_STATUS_CMD_start == 1) {
     motor__run_dc_motor_by_speed((double)motor_val.DRIVER_TO_MOTOR_speed / 1000.0);
     motor__turn_servo_by_angle(motor_val.DRIVER_TO_MOTOR_steer);

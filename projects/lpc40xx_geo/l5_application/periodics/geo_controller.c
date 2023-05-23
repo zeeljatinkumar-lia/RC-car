@@ -33,7 +33,7 @@ static void geo_controller__decode_bridge_message(can__msg_t *msg) {
 }
 
 void geo_controller__print_coord_and_heading_values() {
-  gps_coordinates_t scaled_dest_coord = {0};
+  volatile gps_coordinates_t scaled_dest_coord = {0};
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
   printf("cur lat:%f, cur long:%f, dest lat:%f, dest long:%f ", (double)current_coord.latitude,
@@ -57,11 +57,10 @@ void geo_controller__read_current_coordinates() {
 }
 
 void geo_controller__calculate_heading() {
-  gps_coordinates_t scaled_dest_coord = {0};
+  volatile gps_coordinates_t scaled_dest_coord = {0};
 
   scaled_dest_coord.latitude = (float)dest_coord.GPS_DEST_LATITUDE_SCALED_100000 / 100000;
   scaled_dest_coord.longitude = (float)dest_coord.GPS_DEST_LONGITUDE_SCALED_100000 / 100000;
-
   geo_status.GEO_STATUS_COMPASS_BEARING = compass__get_current_bearing();
 
   geo_status.GEO_STATUS_SATELLITE_LOCKED = gps__get_satellite_lock_status();

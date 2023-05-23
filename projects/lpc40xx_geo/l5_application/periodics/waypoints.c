@@ -58,9 +58,11 @@ static gps_coordinates_t waypoints__get_next_coordinate(gps_coordinates_t curren
 
 uint16_t waypoints__calculate_heading_to_next_point(gps_coordinates_t current_coords, gps_coordinates_t dest_coords) {
   uint16_t next_point_heading = 0;
-  gps_coordinates_t next_coords = waypoints__get_next_coordinate(current_coords, dest_coords);
+  // gps_coordinates_t next_coords = waypoints__get_next_coordinate(current_coords, dest_coords);
+  // next_point_heading = (uint16_t)calculate_heading(current_coords.latitude, current_coords.longitude,
+  //                                                  next_coords.latitude, next_coords.longitude);
   next_point_heading = (uint16_t)calculate_heading(current_coords.latitude, current_coords.longitude,
-                                                   next_coords.latitude, next_coords.longitude);
+                                                   dest_coords.latitude, dest_coords.longitude);
   return next_point_heading;
 }
 
