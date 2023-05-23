@@ -107,13 +107,11 @@ void can_bridge_controller__Sending_dest_location(void) {
 
   if (gps_dest_data_latched) {
     // printf("gps destination latched");
-    BRIDGE_TO_GPS_DATA.GPS_DEST_LATITUDE_SCALED_100000 =
-        gps_destination_location_last_sent.GPS_DEST_LATITUDE_SCALED_100000;
-    BRIDGE_TO_GPS_DATA.GPS_DEST_LONGITUDE_SCALED_100000 =
-        gps_destination_location_last_sent.GPS_DEST_LONGITUDE_SCALED_100000;
+    BRIDGE_TO_GPS_DATA.GPS_DEST_LATITUDE_SCALED_100000 = gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000;
+    BRIDGE_TO_GPS_DATA.GPS_DEST_LONGITUDE_SCALED_100000 = gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000;
     // printf("Latitude is %ld and longitude is %ld \n", gps_destination_location.GPS_DEST_LATITUDE_SCALED_100000,
     // gps_destination_location.GPS_DEST_LONGITUDE_SCALED_100000);
-    header = dbc_encode_GPS_DESTINATION(can_msg.data.bytes, &gps_destination_location_last_sent);
+    header = dbc_encode_GPS_DESTINATION(can_msg.data.bytes, &BRIDGE_TO_GPS_DATA);
 
     can_msg.msg_id = header.message_id;
     can_msg.frame_fields.data_len = header.message_dlc;
@@ -165,8 +163,7 @@ void bridge_controller_transmit_value_to_app(void) {
            (double)geo_coordinates_to_app.CURR_LONGITUDE_SCALED_100000 / 100000,
            compass_value_to_app.GEO_STATUS_COMPASS_BEARING,
            (double)motor_speed_to_app.MOTOR_TO_APP_DBG_current_speed / 1000,
-           motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer,
-           compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
+           motor_speed_to_app.MOTOR_TO_APP_DBG_current_steer, compass_value_to_app.GEO_STATUS_DISTANCE_TO_DESTINATION);
 
   uart_printf(bridge_uart, "%s", sensor_msg);
 }
