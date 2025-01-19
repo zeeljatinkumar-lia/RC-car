@@ -1,3 +1,23 @@
+# Autonomous RC Car 🚗
+
+An autonomous RC car capable of moving from point A to point B while avoiding obstacles. The car integrates sensor data and communication modules for seamless operation.
+
+## My Contribution
+- Implemented the core functionality for obstacle detection and avoidance using ultrasonic sensors.
+- Optimized sensor data processing and communication for real-time performance.
+- Debugged and resolved critical issues in the CAN bus communication module.
+
+## Features
+- Obstacle detection and avoidance using ultrasonic sensors.
+- Bluetooth-based control for setting target points.
+- CAN bus for inter-controller communication.
+
+## Technology Stack
+- **Hardware:** Ultrasonic sensors, Bluetooth module, CAN bus controllers.
+- **Software:** Embedded C, Microcontroller programming.
+- **Tools:** GCC, Oscilloscope for debugging, Protocol analyzers.
+
+
 # SJ2-C Development Environment
 
 An `SJ2` board is used at San Jose State University (SJSU) to teach Embedded Systems' courses. Part of this Git repository also includes development environment for not just an ARM controller, but also support to compile and test software on your host machine such as Windows, Mac etc.
