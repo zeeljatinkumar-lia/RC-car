@@ -3,10 +3,11 @@
 An autonomous RC car capable of moving from point A to point B while avoiding obstacles. The car integrates sensor data and communication modules for seamless operation.
 
 ## My Contribution
-- Implemented the core functionality for obstacle detection and avoidance using ultrasonic sensors.
-- Optimized sensor data processing and communication for real-time performance.
-- Debugged and resolved critical issues in the CAN bus communication module.
 
+- Implemented Optimized sensor data processing and communication using CAN for real-time performance. [https://github.com/zeeljatinkumar-lia/RC-car/tree/dev/sensor_plus_bridge/projects/lpc40xx_sensor/l5_application]
+- Integrated LCD with Driver Controller [https://github.com/zeeljatinkumar-lia/RC-car/tree/mrg/LCD_working_separately ]
+- Intialized bluetooth for communication between the car and mobile application 
+  
 ## Features
 - Obstacle detection and avoidance using ultrasonic sensors.
 - Bluetooth-based control for setting target points.
